@@ -789,9 +789,11 @@ public class ProvenanceService  extends javax.servlet.http.HttpServlet implement
 			for(Edge e : n.getAdjacencies()){
 				if(!l.contains(e.getTo())){
 					l.addNode(e.getTo());
+					e.getTo().addAdjacency(e);
 				}
 				if(!l.contains(e.getFrom())){
 					l.addNode(e.getFrom());
+					e.getFrom().addAdjacency(e);
 				}
 			}
 		}
