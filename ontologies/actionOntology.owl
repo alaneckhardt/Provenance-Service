@@ -1,0 +1,155 @@
+<?xml version="1.0"?>
+<rdf:RDF
+    xmlns:protege="http://protege.stanford.edu/plugins/owl/protege#"
+    xmlns:xsp="http://www.owl-ontologies.com/2005/08/07/xsp.owl#"
+    xmlns:swrlb="http://www.w3.org/2003/11/swrlb#"
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns:j.0="http://xmlns.com/foaf/0.1/"
+    xmlns:p1="http://www.w3.org/1999/xhtml"
+    xmlns:owl="http://www.w3.org/2002/07/owl#"
+    xmlns:opm="http://openprovenance.org/model/opmo#"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+    xmlns:swrl="http://www.w3.org/2003/11/swrl#"
+    xmlns:j.1="http://purl.org/net/provenance/ns#"
+    xmlns="http://www.policygrid.org/ourspacesVRE.owl#"
+    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+  xml:base="http://www.policygrid.org/ourspacesVRE.owl">
+  <rdfs:Class rdf:about="http://xmlns.com/foaf/0.1/Person"/>
+  <rdfs:Class rdf:about="http://www.w3.org/2006/time#TemporalEntity"/>
+  <rdfs:Class rdf:about="http://www.w3.org/2006/time#Instant"/>
+  <owl:Class rdf:about="http://openprovenance.org/ontology#Process"/>
+  <owl:Class rdf:ID="SendContactListInvite">
+    <rdfs:subClassOf>
+      <owl:Class rdf:ID="SendInvite"/>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:ID="IgnoreInvite">
+    <rdfs:subClassOf>
+      <owl:Class rdf:ID="IgnoreMessage"/>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:ID="ResourceAction">
+    <rdfs:subClassOf rdf:resource="http://openprovenance.org/ontology#Process"/>
+  </owl:Class>
+  <owl:Class rdf:ID="SendMessage">
+    <rdfs:subClassOf>
+      <owl:Class rdf:ID="MessagingAction"/>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:ID="SendReply">
+    <rdfs:subClassOf rdf:resource="#SendMessage"/>
+  </owl:Class>
+  <owl:Class rdf:ID="PersonSearch">
+    <rdfs:subClassOf>
+      <owl:Class rdf:ID="QueryAction"/>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:ID="SoftwareAgent">
+    <rdfs:subClassOf rdf:resource="http://purl.org/net/opmv/ns#Agent"/>
+  </owl:Class>
+  <owl:Class rdf:ID="UserAction">
+    <rdfs:subClassOf rdf:resource="http://openprovenance.org/ontology#Process"/>
+    <owl:equivalentClass>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://openprovenance.org/model/opmo#effectWasControlledBy"/>
+        <owl:allValuesFrom>
+          <owl:Restriction>
+            <owl:onProperty rdf:resource="http://openprovenance.org/model/opmo#causeWasControlledBy"/>
+            <owl:allValuesFrom rdf:resource="http://xmlns.com/foaf/0.1/Person"/>
+          </owl:Restriction>
+        </owl:allValuesFrom>
+      </owl:Restriction>
+    </owl:equivalentClass>
+  </owl:Class>
+  <owl:Class rdf:ID="ResourceSearch">
+    <rdfs:subClassOf>
+      <owl:Class rdf:about="#QueryAction"/>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:ID="NLGAction">
+    <rdfs:subClassOf>
+      <owl:Class rdf:about="#QueryAction"/>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:ID="CreateSocialLink">
+    <rdfs:subClassOf>
+      <owl:Class rdf:ID="SocialNetworkStateChange"/>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:ID="CommunicationAction">
+    <rdfs:subClassOf rdf:resource="http://openprovenance.org/ontology#Process"/>
+  </owl:Class>
+  <owl:Class rdf:ID="EditResource">
+    <rdfs:subClassOf rdf:resource="#ResourceAction"/>
+  </owl:Class>
+  <owl:Class rdf:about="#SendInvite">
+    <rdfs:subClassOf rdf:resource="#SendMessage"/>
+  </owl:Class>
+  <owl:Class rdf:about="#MessagingAction">
+    <rdfs:subClassOf rdf:resource="#CommunicationAction"/>
+  </owl:Class>
+  <owl:Class rdf:about="#SocialNetworkStateChange">
+    <rdfs:subClassOf>
+      <owl:Class rdf:ID="StateChangeAction"/>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:about="#IgnoreMessage">
+    <rdfs:subClassOf rdf:resource="#MessagingAction"/>
+  </owl:Class>
+  <owl:Class rdf:ID="UploadResource">
+    <rdfs:subClassOf rdf:resource="#ResourceAction"/>
+  </owl:Class>
+  <owl:Class rdf:ID="AcceptInvite">
+    <rdfs:subClassOf rdf:resource="#SendReply"/>
+  </owl:Class>
+  <owl:Class rdf:about="#StateChangeAction">
+    <rdfs:subClassOf rdf:resource="http://openprovenance.org/ontology#Process"/>
+  </owl:Class>
+  <owl:Class rdf:ID="SendEventInvite">
+    <rdfs:subClassOf rdf:resource="#SendInvite"/>
+  </owl:Class>
+  <owl:Class rdf:ID="RejectInvite">
+    <rdfs:subClassOf rdf:resource="#SendReply"/>
+  </owl:Class>
+  <owl:Class rdf:ID="DownloadResource">
+    <rdfs:subClassOf rdf:resource="#ResourceAction"/>
+  </owl:Class>
+  <owl:Class rdf:ID="ReadMessage">
+    <rdfs:subClassOf rdf:resource="#MessagingAction"/>
+  </owl:Class>
+  <owl:Class rdf:ID="SendProjectInvite">
+    <rdfs:subClassOf rdf:resource="#SendInvite"/>
+  </owl:Class>
+  <owl:Class rdf:ID="RemoveSocialLink">
+    <rdfs:subClassOf rdf:resource="#SocialNetworkStateChange"/>
+  </owl:Class>
+  <owl:Class rdf:about="#QueryAction">
+    <rdfs:subClassOf rdf:resource="http://openprovenance.org/ontology#Process"/>
+  </owl:Class>
+  <owl:Class rdf:ID="SystemAction">
+    <rdfs:subClassOf rdf:resource="http://openprovenance.org/ontology#Process"/>
+    <owl:equivalentClass>
+      <owl:Restriction>
+        <owl:allValuesFrom>
+          <owl:Restriction>
+            <owl:onProperty rdf:resource="http://openprovenance.org/model/opmo#causeWasControlledBy"/>
+            <owl:allValuesFrom rdf:resource="#SoftwareAgent"/>
+          </owl:Restriction>
+        </owl:allValuesFrom>
+        <owl:onProperty rdf:resource="http://openprovenance.org/model/opmo#effectWasControlledBy"/>
+      </owl:Restriction>
+    </owl:equivalentClass>
+  </owl:Class>
+  <rdf:Description rdf:about="http://xmlns.com/foaf/0.1/Agent">
+    <rdfs:subClassOf rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
+    <rdfs:subClassOf rdf:resource="http://purl.org/net/opmv/ns#Agent"/>
+  </rdf:Description>
+  <j.1:DataCreation/>
+  <owl:AllDisjointClasses/>
+  <j.1:DataCreation/>
+  <j.0:Person rdf:about="http://users.ox.ac.uk/~zool0770/foaf.rdf#me"/>
+  <owl:AllDisjointClasses/>
+  <owl:AllDisjointClasses/>
+</rdf:RDF>
+
+<!-- Created with Protege (with OWL Plugin 3.4.7, Build 620)  http://protege.stanford.edu -->

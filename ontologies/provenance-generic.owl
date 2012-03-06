@@ -1,0 +1,1910 @@
+<?xml version="1.0"?>
+
+
+<!DOCTYPE rdf:RDF [
+    <!ENTITY ff "http://xmlns.com/foaf/0.1/" >
+    <!ENTITY time "http://www.w3.org/2006/time#" >
+    <!ENTITY owl "http://www.w3.org/2002/07/owl#" >
+    <!ENTITY swrl "http://www.w3.org/2003/11/swrl#" >
+    <!ENTITY swrlb "http://www.w3.org/2003/11/swrlb#" >
+    <!ENTITY ontology "http://www.geonames.org/ontology#" >
+    <!ENTITY xsd "http://www.w3.org/2001/XMLSchema#" >
+    <!ENTITY opm "http://openprovenance.org/ontology#" >
+    <!ENTITY rdfs "http://www.w3.org/2000/01/rdf-schema#" >
+    <!ENTITY project "http://www.policygrid.org/project.owl#" >
+    <!ENTITY p1 "http://www.policygrid.org/utility.owl#" >
+    <!ENTITY rdf "http://www.w3.org/1999/02/22-rdf-syntax-ns#" >
+    <!ENTITY protege "http://protege.stanford.edu/plugins/owl/protege#" >
+    <!ENTITY xsp "http://www.owl-ontologies.com/2005/08/07/xsp.owl#" >
+]>
+
+
+<rdf:RDF xmlns="http://www.policygrid.org/provenance-generic.owl#"
+     xml:base="http://www.policygrid.org/provenance-generic.owl"
+     xmlns:opm="http://openprovenance.org/ontology#"
+     xmlns:protege="http://protege.stanford.edu/plugins/owl/protege#"
+     xmlns:xsp="http://www.owl-ontologies.com/2005/08/07/xsp.owl#"
+     xmlns:p1="http://www.policygrid.org/utility.owl#"
+     xmlns:ontology="http://www.geonames.org/ontology#"
+     xmlns:project="http://www.policygrid.org/project.owl#"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+     xmlns:time="http://www.w3.org/2006/time#"
+     xmlns:swrl="http://www.w3.org/2003/11/swrl#"
+     xmlns:ff="http://xmlns.com/foaf/0.1/"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+     xmlns:owl="http://www.w3.org/2002/07/owl#"
+     xmlns:swrlb="http://www.w3.org/2003/11/swrlb#"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+    <owl:Ontology rdf:about="http://www.policygrid.org/provenance-generic.owl">
+        <owl:imports rdf:resource="http://openprovenance.org/model/opm.owl"/>
+        <owl:imports rdf:resource="http://www.geonames.org/ontology"/>
+        <owl:imports rdf:resource="http://www.w3.org/2006/time"/>
+    </owl:Ontology>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Annotation properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    <owl:AnnotationProperty rdf:about="&rdfs;comment"/>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Object Properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://openprovenance.org/ontology#cause -->
+
+    <owl:ObjectProperty rdf:about="&opm;cause">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+        <rdfs:comment rdf:datatype="&xsd;string">the cause of an Edge</rdfs:comment>
+        <rdfs:domain rdf:resource="&opm;Edge"/>
+        <rdfs:range rdf:resource="&opm;Node"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://openprovenance.org/ontology#effect -->
+
+    <owl:ObjectProperty rdf:about="&opm;effect">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+        <rdfs:comment rdf:datatype="&xsd;string">the effect of an Edge</rdfs:comment>
+        <rdfs:domain rdf:resource="&opm;Edge"/>
+        <rdfs:range rdf:resource="&opm;Node"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#CollectedInSurveyOrExperiment -->
+
+    <owl:ObjectProperty rdf:about="http://www.policygrid.org/provenance-generic.owl#CollectedInSurveyOrExperiment">
+        <rdfs:comment rdf:datatype="&xsd;string">Tasks and stages</rdfs:comment>
+        <rdfs:range rdf:resource="http://www.policygrid.org/provenance-generic.owl#Experiment"/>
+        <rdfs:subPropertyOf rdf:resource="http://www.policygrid.org/provenance-generic.owl#producedDuring"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#CreatedUsingDiaryTask -->
+
+    <owl:ObjectProperty rdf:about="http://www.policygrid.org/provenance-generic.owl#CreatedUsingDiaryTask">
+        <rdfs:comment rdf:datatype="&xsd;string">Tasks and stages</rdfs:comment>
+        <rdfs:range rdf:resource="http://www.policygrid.org/provenance-generic.owl#ResearchDiary"/>
+        <rdfs:subPropertyOf rdf:resource="http://www.policygrid.org/provenance-generic.owl#producedDuring"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#DesignedInTask -->
+
+    <owl:ObjectProperty rdf:about="http://www.policygrid.org/provenance-generic.owl#DesignedInTask">
+        <rdfs:comment rdf:datatype="&xsd;string">Tasks and stages</rdfs:comment>
+        <rdfs:subPropertyOf rdf:resource="http://www.policygrid.org/provenance-generic.owl#producedDuring"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#FactualNotesOf -->
+
+    <owl:ObjectProperty rdf:about="http://www.policygrid.org/provenance-generic.owl#FactualNotesOf">
+        <rdfs:comment rdf:datatype="&xsd;string">Tasks and stages</rdfs:comment>
+        <rdfs:subPropertyOf rdf:resource="http://www.policygrid.org/provenance-generic.owl#producedDuring"/>
+        <rdfs:range>
+            <owl:Class>
+                <owl:unionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="http://www.policygrid.org/provenance-generic.owl#FocusGroup"/>
+                    <rdf:Description rdf:about="http://www.policygrid.org/provenance-generic.owl#Interview"/>
+                </owl:unionOf>
+            </owl:Class>
+        </rdfs:range>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#HasResourceItem -->
+
+    <owl:ObjectProperty rdf:about="http://www.policygrid.org/provenance-generic.owl#HasResourceItem">
+        <rdfs:subPropertyOf rdf:resource="&p1;hasItem"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#HasTaskItem -->
+
+    <owl:ObjectProperty rdf:about="http://www.policygrid.org/provenance-generic.owl#HasTaskItem">
+        <rdfs:subPropertyOf rdf:resource="&p1;hasItem"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#IntervieweeOf -->
+
+    <owl:ObjectProperty rdf:about="http://www.policygrid.org/provenance-generic.owl#IntervieweeOf">
+        <rdfs:comment rdf:datatype="&xsd;string">Activities/Roles</rdfs:comment>
+        <rdfs:range rdf:resource="http://www.policygrid.org/provenance-generic.owl#Interview"/>
+        <rdfs:subPropertyOf rdf:resource="http://www.policygrid.org/provenance-generic.owl#participatedIn"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#RecordingOf -->
+
+    <owl:ObjectProperty rdf:about="http://www.policygrid.org/provenance-generic.owl#RecordingOf">
+        <rdfs:comment rdf:datatype="&xsd;string">Tasks and stages</rdfs:comment>
+        <rdfs:subPropertyOf rdf:resource="http://www.policygrid.org/provenance-generic.owl#producedDuring"/>
+        <rdfs:range>
+            <owl:Class>
+                <owl:unionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="http://www.policygrid.org/provenance-generic.owl#Experiment"/>
+                    <rdf:Description rdf:about="http://www.policygrid.org/provenance-generic.owl#FocusGroup"/>
+                    <rdf:Description rdf:about="http://www.policygrid.org/provenance-generic.owl#Interview"/>
+                </owl:unionOf>
+            </owl:Class>
+        </rdfs:range>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#RespondentOf -->
+
+    <owl:ObjectProperty rdf:about="http://www.policygrid.org/provenance-generic.owl#RespondentOf">
+        <rdfs:comment rdf:datatype="&xsd;string">Activities/Roles</rdfs:comment>
+        <rdfs:range rdf:resource="http://www.policygrid.org/provenance-generic.owl#QuestionnaireSurvey"/>
+        <rdfs:subPropertyOf rdf:resource="http://www.policygrid.org/provenance-generic.owl#participatedIn"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#TranscriptOf -->
+
+    <owl:ObjectProperty rdf:about="http://www.policygrid.org/provenance-generic.owl#TranscriptOf">
+        <rdfs:comment rdf:datatype="&xsd;string">Tasks and stages</rdfs:comment>
+        <rdfs:subPropertyOf rdf:resource="http://www.policygrid.org/provenance-generic.owl#producedDuring"/>
+        <rdfs:range>
+            <owl:Class>
+                <owl:unionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="http://www.policygrid.org/provenance-generic.owl#FocusGroup"/>
+                    <rdf:Description rdf:about="http://www.policygrid.org/provenance-generic.owl#Interview"/>
+                </owl:unionOf>
+            </owl:Class>
+        </rdfs:range>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#TranscriptSummaryOfInterview -->
+
+    <owl:ObjectProperty rdf:about="http://www.policygrid.org/provenance-generic.owl#TranscriptSummaryOfInterview">
+        <rdfs:comment rdf:datatype="&xsd;string">Tasks and stages</rdfs:comment>
+        <rdfs:subPropertyOf rdf:resource="http://www.policygrid.org/provenance-generic.owl#producedDuring"/>
+        <rdfs:range>
+            <owl:Class>
+                <owl:unionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="http://www.policygrid.org/provenance-generic.owl#FocusGroup"/>
+                    <rdf:Description rdf:about="http://www.policygrid.org/provenance-generic.owl#Interview"/>
+                </owl:unionOf>
+            </owl:Class>
+        </rdfs:range>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#aggregationThreshold -->
+
+    <owl:ObjectProperty rdf:about="http://www.policygrid.org/provenance-generic.owl#aggregationThreshold">
+        <rdfs:domain rdf:resource="&opm;Process"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#contestedBy -->
+
+    <owl:ObjectProperty rdf:about="http://www.policygrid.org/provenance-generic.owl#contestedBy">
+        <rdfs:comment rdf:datatype="&xsd;string">Relations to projects or resources</rdfs:comment>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#controlledInfer -->
+
+    <owl:ObjectProperty rdf:about="http://www.policygrid.org/provenance-generic.owl#controlledInfer">
+        <rdfs:domain rdf:resource="&opm;Artifact"/>
+        <rdfs:range rdf:resource="&opm;Process"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#dateOfCreation -->
+
+    <owl:ObjectProperty rdf:about="http://www.policygrid.org/provenance-generic.owl#dateOfCreation">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+        <rdfs:comment rdf:datatype="&xsd;string">General information</rdfs:comment>
+        <rdfs:range rdf:resource="&time;Instant"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#dateOfDeposit -->
+
+    <owl:ObjectProperty rdf:about="http://www.policygrid.org/provenance-generic.owl#dateOfDeposit">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+        <rdfs:comment rdf:datatype="&xsd;string">General information</rdfs:comment>
+        <rdfs:range rdf:resource="&time;Instant"/>
+        <rdfs:domain>
+            <owl:Class>
+                <owl:unionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="http://www.policygrid.org/provenance-generic.owl#Data"/>
+                    <rdf:Description rdf:about="http://www.policygrid.org/provenance-generic.owl#Documentation"/>
+                    <rdf:Description rdf:about="http://www.policygrid.org/provenance-generic.owl#Paper"/>
+                    <rdf:Description rdf:about="http://www.policygrid.org/provenance-generic.owl#Presentation"/>
+                    <rdf:Description rdf:about="http://www.policygrid.org/provenance-generic.owl#Report"/>
+                </owl:unionOf>
+            </owl:Class>
+        </rdfs:domain>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#dateOfPublication -->
+
+    <owl:ObjectProperty rdf:about="http://www.policygrid.org/provenance-generic.owl#dateOfPublication">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+        <rdfs:comment rdf:datatype="&xsd;string">General information</rdfs:comment>
+        <rdfs:range rdf:resource="&time;Instant"/>
+        <rdfs:domain>
+            <owl:Class>
+                <owl:unionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="http://www.policygrid.org/provenance-generic.owl#Paper"/>
+                    <rdf:Description rdf:about="http://www.policygrid.org/provenance-generic.owl#PublishedReport"/>
+                </owl:unionOf>
+            </owl:Class>
+        </rdfs:domain>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#depositedBy -->
+
+    <owl:ObjectProperty rdf:about="http://www.policygrid.org/provenance-generic.owl#depositedBy">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+        <rdfs:comment rdf:datatype="&xsd;string">General information</rdfs:comment>
+        <rdfs:range rdf:resource="&ff;OnlineAccount"/>
+        <rdfs:domain>
+            <owl:Class>
+                <owl:unionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="http://www.policygrid.org/provenance-generic.owl#Communication"/>
+                    <rdf:Description rdf:about="http://www.policygrid.org/provenance-generic.owl#Data"/>
+                    <rdf:Description rdf:about="http://www.policygrid.org/provenance-generic.owl#Documentation"/>
+                    <rdf:Description rdf:about="http://www.policygrid.org/provenance-generic.owl#Paper"/>
+                    <rdf:Description rdf:about="http://www.policygrid.org/provenance-generic.owl#Presentation"/>
+                    <rdf:Description rdf:about="http://www.policygrid.org/provenance-generic.owl#Report"/>
+                </owl:unionOf>
+            </owl:Class>
+        </rdfs:domain>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#describedBy -->
+
+    <owl:ObjectProperty rdf:about="http://www.policygrid.org/provenance-generic.owl#describedBy">
+        <rdfs:comment rdf:datatype="&xsd;string">General information</rdfs:comment>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#documentationOf -->
+
+    <owl:ObjectProperty rdf:about="http://www.policygrid.org/provenance-generic.owl#documentationOf">
+        <rdfs:domain rdf:resource="http://www.policygrid.org/provenance-generic.owl#Documentation"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#evaluatedBy -->
+
+    <owl:ObjectProperty rdf:about="http://www.policygrid.org/provenance-generic.owl#evaluatedBy">
+        <rdfs:comment rdf:datatype="&xsd;string">Relations to projects or resources</rdfs:comment>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#generatedInfer -->
+
+    <owl:ObjectProperty rdf:about="http://www.policygrid.org/provenance-generic.owl#generatedInfer">
+        <rdfs:range rdf:resource="&opm;Artifact"/>
+        <rdfs:domain rdf:resource="&opm;Process"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#hasAuthor -->
+
+    <owl:ObjectProperty rdf:about="http://www.policygrid.org/provenance-generic.owl#hasAuthor">
+        <rdfs:comment rdf:datatype="&xsd;string">General information</rdfs:comment>
+        <rdfs:range rdf:resource="&ff;Person"/>
+        <rdfs:domain>
+            <owl:Class>
+                <owl:unionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="http://www.policygrid.org/provenance-generic.owl#Documentation"/>
+                    <rdf:Description rdf:about="http://www.policygrid.org/provenance-generic.owl#Paper"/>
+                    <rdf:Description rdf:about="http://www.policygrid.org/provenance-generic.owl#Presentation"/>
+                    <rdf:Description rdf:about="http://www.policygrid.org/provenance-generic.owl#Report"/>
+                </owl:unionOf>
+            </owl:Class>
+        </rdfs:domain>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#hasRecordingTranscript -->
+
+    <owl:ObjectProperty rdf:about="http://www.policygrid.org/provenance-generic.owl#hasRecordingTranscript">
+        <rdfs:comment rdf:datatype="&xsd;string">Relations to projects or resources</rdfs:comment>
+        <rdfs:range rdf:resource="http://www.policygrid.org/provenance-generic.owl#Transcript"/>
+        <rdfs:domain>
+            <owl:Class>
+                <owl:unionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="http://www.policygrid.org/provenance-generic.owl#Audio"/>
+                    <rdf:Description rdf:about="http://www.policygrid.org/provenance-generic.owl#Video"/>
+                </owl:unionOf>
+            </owl:Class>
+        </rdfs:domain>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#hasRun -->
+
+    <owl:ObjectProperty rdf:about="http://www.policygrid.org/provenance-generic.owl#hasRun"/>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#hasSessionAddress -->
+
+    <owl:ObjectProperty rdf:about="http://www.policygrid.org/provenance-generic.owl#hasSessionAddress">
+        <rdfs:comment rdf:datatype="&xsd;string">xxx</rdfs:comment>
+        <rdfs:range rdf:resource="&p1;Address"/>
+        <rdfs:domain>
+            <owl:Class>
+                <owl:unionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="http://www.policygrid.org/provenance-generic.owl#Experiment"/>
+                    <rdf:Description rdf:about="http://www.policygrid.org/provenance-generic.owl#FocusGroup"/>
+                    <rdf:Description rdf:about="http://www.policygrid.org/provenance-generic.owl#Interview"/>
+                </owl:unionOf>
+            </owl:Class>
+        </rdfs:domain>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#hasSponsor -->
+
+    <owl:ObjectProperty rdf:about="http://www.policygrid.org/provenance-generic.owl#hasSponsor">
+        <rdfs:range>
+            <owl:Class>
+                <owl:unionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="&p1;Department"/>
+                    <rdf:Description rdf:about="&p1;Organisation"/>
+                </owl:unionOf>
+            </owl:Class>
+        </rdfs:range>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#investigatedBy -->
+
+    <owl:ObjectProperty rdf:about="http://www.policygrid.org/provenance-generic.owl#investigatedBy">
+        <rdfs:comment rdf:datatype="&xsd;string">Relations to projects or resources</rdfs:comment>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#location -->
+
+    <owl:ObjectProperty rdf:about="http://www.policygrid.org/provenance-generic.owl#location">
+        <rdfs:comment rdf:datatype="&xsd;string">Where</rdfs:comment>
+        <rdfs:range rdf:resource="&ontology;Feature"/>
+        <rdfs:domain rdf:resource="http://www.policygrid.org/provenance-generic.owl#DataCollection"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#nlgType -->
+
+    <owl:ObjectProperty rdf:about="http://www.policygrid.org/provenance-generic.owl#nlgType">
+        <rdfs:domain rdf:resource="&opm;Process"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#participatedIn -->
+
+    <owl:ObjectProperty rdf:about="http://www.policygrid.org/provenance-generic.owl#participatedIn">
+        <rdfs:comment rdf:datatype="&xsd;string">Activities/Roles</rdfs:comment>
+        <rdfs:range rdf:resource="http://www.policygrid.org/provenance-generic.owl#DataCollection"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#presentedBy -->
+
+    <owl:ObjectProperty rdf:about="http://www.policygrid.org/provenance-generic.owl#presentedBy">
+        <rdfs:domain rdf:resource="http://www.policygrid.org/provenance-generic.owl#Presentation"/>
+        <rdfs:range rdf:resource="&ff;Person"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#previousVersion -->
+
+    <owl:ObjectProperty rdf:about="http://www.policygrid.org/provenance-generic.owl#previousVersion">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#producedDuring -->
+
+    <owl:ObjectProperty rdf:about="http://www.policygrid.org/provenance-generic.owl#producedDuring">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+        <rdfs:comment rdf:datatype="&xsd;string">Tasks and stages</rdfs:comment>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#producedInProject -->
+
+    <owl:ObjectProperty rdf:about="http://www.policygrid.org/provenance-generic.owl#producedInProject">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+        <rdfs:comment rdf:datatype="&xsd;string">Relations to projects or resources</rdfs:comment>
+        <rdfs:domain rdf:resource="&opm;Artifact"/>
+        <rdfs:range rdf:resource="&project;Project"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#refutedBy -->
+
+    <owl:ObjectProperty rdf:about="http://www.policygrid.org/provenance-generic.owl#refutedBy">
+        <rdfs:comment rdf:datatype="&xsd;string">Relations to projects or resources</rdfs:comment>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#researchAimOrQuestionInvestigated -->
+
+    <owl:ObjectProperty rdf:about="http://www.policygrid.org/provenance-generic.owl#researchAimOrQuestionInvestigated">
+        <rdfs:comment rdf:datatype="&xsd;string">Why</rdfs:comment>
+        <rdfs:domain rdf:resource="&opm;Process"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#reviewedBy -->
+
+    <owl:ObjectProperty rdf:about="http://www.policygrid.org/provenance-generic.owl#reviewedBy">
+        <rdfs:comment rdf:datatype="&xsd;string">Relations to projects or resources</rdfs:comment>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#sponsorOf -->
+
+    <owl:ObjectProperty rdf:about="http://www.policygrid.org/provenance-generic.owl#sponsorOf">
+        <rdfs:domain>
+            <owl:Class>
+                <owl:unionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="&p1;Department"/>
+                    <rdf:Description rdf:about="&p1;Organisation"/>
+                </owl:unionOf>
+            </owl:Class>
+        </rdfs:domain>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#supportedBy -->
+
+    <owl:ObjectProperty rdf:about="http://www.policygrid.org/provenance-generic.owl#supportedBy">
+        <rdfs:comment rdf:datatype="&xsd;string">Relations to projects or resources</rdfs:comment>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#timePeriodCovered -->
+
+    <owl:ObjectProperty rdf:about="http://www.policygrid.org/provenance-generic.owl#timePeriodCovered">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+        <rdfs:comment rdf:datatype="&xsd;string">When</rdfs:comment>
+        <rdfs:domain rdf:resource="http://www.policygrid.org/provenance-generic.owl#DataCollection"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#transcribedBy -->
+
+    <owl:ObjectProperty rdf:about="http://www.policygrid.org/provenance-generic.owl#transcribedBy">
+        <rdfs:domain rdf:resource="http://www.policygrid.org/provenance-generic.owl#Transcript"/>
+        <rdfs:range rdf:resource="&ff;Person"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#usedInfer -->
+
+    <owl:ObjectProperty rdf:about="http://www.policygrid.org/provenance-generic.owl#usedInfer">
+        <rdfs:range rdf:resource="&opm;Artifact"/>
+        <rdfs:domain rdf:resource="&opm;Process"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#wasControlledByInfer -->
+
+    <owl:ObjectProperty rdf:about="http://www.policygrid.org/provenance-generic.owl#wasControlledByInfer">
+        <rdfs:range rdf:resource="&opm;Artifact"/>
+        <rdfs:domain rdf:resource="&opm;Process"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#wasGeneratedByInfer -->
+
+    <owl:ObjectProperty rdf:about="http://www.policygrid.org/provenance-generic.owl#wasGeneratedByInfer">
+        <rdfs:domain rdf:resource="&opm;Artifact"/>
+        <rdfs:range rdf:resource="&opm;Process"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#wasUsedByInfer -->
+
+    <owl:ObjectProperty rdf:about="http://www.policygrid.org/provenance-generic.owl#wasUsedByInfer">
+        <rdfs:domain rdf:resource="&opm;Artifact"/>
+        <rdfs:range rdf:resource="&opm;Process"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.policygrid.org/utility.owl#hasItem -->
+
+    <owl:ObjectProperty rdf:about="&p1;hasItem"/>
+    
+
+
+    <!-- http://www.w3.org/2002/07/owl#topObjectProperty -->
+
+    <owl:ObjectProperty rdf:about="&owl;topObjectProperty"/>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Data properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#Weighting -->
+
+    <owl:DatatypeProperty rdf:about="http://www.policygrid.org/provenance-generic.owl#Weighting">
+        <rdfs:comment rdf:datatype="&xsd;string">How</rdfs:comment>
+        <rdfs:domain rdf:resource="http://www.policygrid.org/provenance-generic.owl#DataAnalysis"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#actionsToMinimiseLosses -->
+
+    <owl:DatatypeProperty rdf:about="http://www.policygrid.org/provenance-generic.owl#actionsToMinimiseLosses">
+        <rdfs:comment rdf:datatype="&xsd;string">How</rdfs:comment>
+        <rdfs:domain rdf:resource="http://www.policygrid.org/provenance-generic.owl#DataCollection"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#analysisApproach -->
+
+    <owl:DatatypeProperty rdf:about="http://www.policygrid.org/provenance-generic.owl#analysisApproach">
+        <rdfs:comment rdf:datatype="&xsd;string">How</rdfs:comment>
+        <rdfs:domain rdf:resource="http://www.policygrid.org/provenance-generic.owl#DataAnalysis"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#characteristicsOfDataCollection -->
+
+    <owl:DatatypeProperty rdf:about="http://www.policygrid.org/provenance-generic.owl#characteristicsOfDataCollection">
+        <rdfs:comment rdf:datatype="&xsd;string">How</rdfs:comment>
+        <rdfs:domain rdf:resource="http://www.policygrid.org/provenance-generic.owl#DataCollection"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#copyright -->
+
+    <owl:DatatypeProperty rdf:about="http://www.policygrid.org/provenance-generic.owl#copyright">
+        <rdfs:comment rdf:datatype="&xsd;string">Access rights</rdfs:comment>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#descriptiveStatisticsUsed -->
+
+    <owl:DatatypeProperty rdf:about="http://www.policygrid.org/provenance-generic.owl#descriptiveStatisticsUsed">
+        <rdfs:comment rdf:datatype="&xsd;string">How</rdfs:comment>
+        <rdfs:subPropertyOf rdf:resource="http://www.policygrid.org/provenance-generic.owl#analysisApproach"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#disclaimer -->
+
+    <owl:DatatypeProperty rdf:about="http://www.policygrid.org/provenance-generic.owl#disclaimer">
+        <rdfs:comment rdf:datatype="&xsd;string">Access rights</rdfs:comment>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#frequencyOfDataCollection -->
+
+    <owl:DatatypeProperty rdf:about="http://www.policygrid.org/provenance-generic.owl#frequencyOfDataCollection">
+        <rdfs:comment rdf:datatype="&xsd;string">When</rdfs:comment>
+        <rdfs:domain rdf:resource="http://www.policygrid.org/provenance-generic.owl#DataCollection"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#geoLocation -->
+
+    <owl:DatatypeProperty rdf:about="http://www.policygrid.org/provenance-generic.owl#geoLocation">
+        <rdfs:comment rdf:datatype="&xsd;string">Where</rdfs:comment>
+        <rdfs:domain rdf:resource="http://www.policygrid.org/provenance-generic.owl#DataCollection"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#geographicalCoverage -->
+
+    <owl:DatatypeProperty rdf:about="http://www.policygrid.org/provenance-generic.owl#geographicalCoverage">
+        <rdfs:comment rdf:datatype="&xsd;string">Where</rdfs:comment>
+        <rdfs:domain rdf:resource="http://www.policygrid.org/provenance-generic.owl#DataCollection"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#geographicalUnit -->
+
+    <owl:DatatypeProperty rdf:about="http://www.policygrid.org/provenance-generic.owl#geographicalUnit">
+        <rdfs:comment rdf:datatype="&xsd;string">Where</rdfs:comment>
+        <rdfs:domain rdf:resource="http://www.policygrid.org/provenance-generic.owl#DataCollection"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#hasAbstract -->
+
+    <owl:DatatypeProperty rdf:about="http://www.policygrid.org/provenance-generic.owl#hasAbstract">
+        <rdfs:comment rdf:datatype="&xsd;string">General information</rdfs:comment>
+        <rdfs:range rdf:resource="&xsd;string"/>
+        <rdfs:domain>
+            <owl:Class>
+                <owl:unionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="http://www.policygrid.org/provenance-generic.owl#Paper"/>
+                    <rdf:Description rdf:about="http://www.policygrid.org/provenance-generic.owl#Report"/>
+                </owl:unionOf>
+            </owl:Class>
+        </rdfs:domain>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#hasEndDate -->
+
+    <owl:DatatypeProperty rdf:about="http://www.policygrid.org/provenance-generic.owl#hasEndDate">
+        <rdfs:comment rdf:datatype="&xsd;string">When</rdfs:comment>
+        <rdfs:domain rdf:resource="&opm;Process"/>
+        <rdfs:range rdf:resource="&xsd;dateTime"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#hasKeyWords -->
+
+    <owl:DatatypeProperty rdf:about="http://www.policygrid.org/provenance-generic.owl#hasKeyWords">
+        <rdfs:comment rdf:datatype="&xsd;string">xxx</rdfs:comment>
+        <rdfs:domain rdf:resource="&opm;Process"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#hasStartDate -->
+
+    <owl:DatatypeProperty rdf:about="http://www.policygrid.org/provenance-generic.owl#hasStartDate">
+        <rdfs:comment rdf:datatype="&xsd;string">When</rdfs:comment>
+        <rdfs:domain rdf:resource="&opm;Process"/>
+        <rdfs:range rdf:resource="&xsd;dateTime"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#hasURI -->
+
+    <owl:DatatypeProperty rdf:about="http://www.policygrid.org/provenance-generic.owl#hasURI">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+        <rdfs:comment rdf:datatype="&xsd;string">URI of the resource (Datstream of the digital object for fedora type or resources, URL for services)</rdfs:comment>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#hypothesis -->
+
+    <owl:DatatypeProperty rdf:about="http://www.policygrid.org/provenance-generic.owl#hypothesis">
+        <rdfs:comment rdf:datatype="&xsd;string">Why</rdfs:comment>
+        <rdfs:domain rdf:resource="http://www.policygrid.org/provenance-generic.owl#DataCollection"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#hypothesisTested -->
+
+    <owl:DatatypeProperty rdf:about="http://www.policygrid.org/provenance-generic.owl#hypothesisTested">
+        <rdfs:comment rdf:datatype="&xsd;string">Why</rdfs:comment>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#interpretativeMethodsUsed -->
+
+    <owl:DatatypeProperty rdf:about="http://www.policygrid.org/provenance-generic.owl#interpretativeMethodsUsed">
+        <rdfs:comment rdf:datatype="&xsd;string">How</rdfs:comment>
+        <rdfs:subPropertyOf rdf:resource="http://www.policygrid.org/provenance-generic.owl#analysisApproach"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#isOvertOrCovert -->
+
+    <owl:DatatypeProperty rdf:about="http://www.policygrid.org/provenance-generic.owl#isOvertOrCovert">
+        <rdfs:comment rdf:datatype="&xsd;string">How</rdfs:comment>
+        <rdfs:range>
+            <rdfs:Datatype>
+                <owl:oneOf>
+                    <rdf:Description>
+                        <rdf:type rdf:resource="&rdf;List"/>
+                        <rdf:first rdf:datatype="&xsd;string">covert</rdf:first>
+                        <rdf:rest>
+                            <rdf:Description>
+                                <rdf:type rdf:resource="&rdf;List"/>
+                                <rdf:first rdf:datatype="&xsd;string">overt</rdf:first>
+                                <rdf:rest rdf:resource="&rdf;nil"/>
+                            </rdf:Description>
+                        </rdf:rest>
+                    </rdf:Description>
+                </owl:oneOf>
+            </rdfs:Datatype>
+        </rdfs:range>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#majorDeviationsFromTheSample -->
+
+    <owl:DatatypeProperty rdf:about="http://www.policygrid.org/provenance-generic.owl#majorDeviationsFromTheSample">
+        <rdfs:comment rdf:datatype="&xsd;string">What</rdfs:comment>
+        <rdfs:domain rdf:resource="http://www.policygrid.org/provenance-generic.owl#DataCollection"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#measurementUnitsUsed -->
+
+    <owl:DatatypeProperty rdf:about="http://www.policygrid.org/provenance-generic.owl#measurementUnitsUsed">
+        <rdfs:comment rdf:datatype="&xsd;string">How</rdfs:comment>
+        <rdfs:domain rdf:resource="http://www.policygrid.org/provenance-generic.owl#DataCollection"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#modeOfDataCollection -->
+
+    <owl:DatatypeProperty rdf:about="http://www.policygrid.org/provenance-generic.owl#modeOfDataCollection">
+        <rdfs:comment rdf:datatype="&xsd;string">How</rdfs:comment>
+        <rdfs:domain rdf:resource="http://www.policygrid.org/provenance-generic.owl#DataCollection"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#numberOfSessions -->
+
+    <owl:DatatypeProperty rdf:about="http://www.policygrid.org/provenance-generic.owl#numberOfSessions">
+        <rdfs:comment rdf:datatype="&xsd;string">What</rdfs:comment>
+        <rdfs:range rdf:resource="&xsd;int"/>
+        <rdfs:domain>
+            <owl:Class>
+                <owl:unionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="http://www.policygrid.org/provenance-generic.owl#Experiment"/>
+                    <rdf:Description rdf:about="http://www.policygrid.org/provenance-generic.owl#FocusGroup"/>
+                    <rdf:Description rdf:about="http://www.policygrid.org/provenance-generic.owl#Interview"/>
+                </owl:unionOf>
+            </owl:Class>
+        </rdfs:domain>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#numberOfUnits -->
+
+    <owl:DatatypeProperty rdf:about="http://www.policygrid.org/provenance-generic.owl#numberOfUnits">
+        <rdfs:comment rdf:datatype="&xsd;string">What</rdfs:comment>
+        <rdfs:domain rdf:resource="http://www.policygrid.org/provenance-generic.owl#DataCollection"/>
+        <rdfs:range rdf:resource="&xsd;int"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#numberReceived -->
+
+    <owl:DatatypeProperty rdf:about="http://www.policygrid.org/provenance-generic.owl#numberReceived">
+        <rdfs:comment rdf:datatype="&xsd;string">What</rdfs:comment>
+        <rdfs:domain rdf:resource="http://www.policygrid.org/provenance-generic.owl#QuestionnaireSurvey"/>
+        <rdfs:range rdf:resource="&xsd;int"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#numberSentOut -->
+
+    <owl:DatatypeProperty rdf:about="http://www.policygrid.org/provenance-generic.owl#numberSentOut">
+        <rdfs:comment rdf:datatype="&xsd;string">What</rdfs:comment>
+        <rdfs:domain rdf:resource="http://www.policygrid.org/provenance-generic.owl#QuestionnaireSurvey"/>
+        <rdfs:range rdf:resource="&xsd;int"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#observationUnit -->
+
+    <owl:DatatypeProperty rdf:about="http://www.policygrid.org/provenance-generic.owl#observationUnit">
+        <rdfs:comment rdf:datatype="&xsd;string">How</rdfs:comment>
+        <rdfs:domain rdf:resource="http://www.policygrid.org/provenance-generic.owl#DataCollection"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#parallelTitle -->
+
+    <owl:DatatypeProperty rdf:about="http://www.policygrid.org/provenance-generic.owl#parallelTitle">
+        <rdfs:comment rdf:datatype="&xsd;string">General information</rdfs:comment>
+        <rdfs:range rdf:resource="&xsd;string"/>
+        <rdfs:domain>
+            <owl:Class>
+                <owl:unionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="http://www.policygrid.org/provenance-generic.owl#Documentation"/>
+                    <rdf:Description rdf:about="http://www.policygrid.org/provenance-generic.owl#Paper"/>
+                    <rdf:Description rdf:about="http://www.policygrid.org/provenance-generic.owl#Presentation"/>
+                    <rdf:Description rdf:about="http://www.policygrid.org/provenance-generic.owl#Report"/>
+                </owl:unionOf>
+            </owl:Class>
+        </rdfs:domain>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#presentedAtConference -->
+
+    <owl:DatatypeProperty rdf:about="http://www.policygrid.org/provenance-generic.owl#presentedAtConference">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+        <rdfs:comment rdf:datatype="&xsd;string">General information</rdfs:comment>
+        <rdfs:range rdf:resource="&xsd;string"/>
+        <rdfs:domain>
+            <owl:Class>
+                <owl:unionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="http://www.policygrid.org/provenance-generic.owl#ConferencePaper"/>
+                    <rdf:Description rdf:about="http://www.policygrid.org/provenance-generic.owl#Presentation"/>
+                </owl:unionOf>
+            </owl:Class>
+        </rdfs:domain>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#publishedIn -->
+
+    <owl:DatatypeProperty rdf:about="http://www.policygrid.org/provenance-generic.owl#publishedIn">
+        <rdfs:comment rdf:datatype="&xsd;string">General information</rdfs:comment>
+        <rdfs:range rdf:resource="&xsd;string"/>
+        <rdfs:domain>
+            <owl:Class>
+                <owl:unionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="http://www.policygrid.org/provenance-generic.owl#Paper"/>
+                    <rdf:Description rdf:about="http://www.policygrid.org/provenance-generic.owl#PublishedReport"/>
+                </owl:unionOf>
+            </owl:Class>
+        </rdfs:domain>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#qualityOfDataSource -->
+
+    <owl:DatatypeProperty rdf:about="http://www.policygrid.org/provenance-generic.owl#qualityOfDataSource">
+        <rdfs:comment rdf:datatype="&xsd;string">xxx</rdfs:comment>
+        <rdfs:domain rdf:resource="http://www.policygrid.org/provenance-generic.owl#DataAnalysis"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#quantitativeOrQualitativeData -->
+
+    <owl:DatatypeProperty rdf:about="http://www.policygrid.org/provenance-generic.owl#quantitativeOrQualitativeData">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+        <rdfs:comment rdf:datatype="&xsd;string">What</rdfs:comment>
+        <rdfs:domain rdf:resource="http://www.policygrid.org/provenance-generic.owl#DataAnalysis"/>
+        <rdfs:range>
+            <rdfs:Datatype>
+                <owl:oneOf>
+                    <rdf:Description>
+                        <rdf:type rdf:resource="&rdf;List"/>
+                        <rdf:first rdf:datatype="&xsd;string">qualitative</rdf:first>
+                        <rdf:rest>
+                            <rdf:Description>
+                                <rdf:type rdf:resource="&rdf;List"/>
+                                <rdf:first rdf:datatype="&xsd;string">quantitative</rdf:first>
+                                <rdf:rest rdf:resource="&rdf;nil"/>
+                            </rdf:Description>
+                        </rdf:rest>
+                    </rdf:Description>
+                </owl:oneOf>
+            </rdfs:Datatype>
+        </rdfs:range>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#questions -->
+
+    <owl:DatatypeProperty rdf:about="http://www.policygrid.org/provenance-generic.owl#questions">
+        <rdfs:comment rdf:datatype="&xsd;string">What</rdfs:comment>
+        <rdfs:domain rdf:resource="http://www.policygrid.org/provenance-generic.owl#QuestionnaireSurvey"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#recodingProcedures -->
+
+    <owl:DatatypeProperty rdf:about="http://www.policygrid.org/provenance-generic.owl#recodingProcedures">
+        <rdfs:comment rdf:datatype="&xsd;string">xxx</rdfs:comment>
+        <rdfs:domain rdf:resource="http://www.policygrid.org/provenance-generic.owl#StatisticalData"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#responseRate -->
+
+    <owl:DatatypeProperty rdf:about="http://www.policygrid.org/provenance-generic.owl#responseRate">
+        <rdfs:comment rdf:datatype="&xsd;string">What</rdfs:comment>
+        <rdfs:domain rdf:resource="http://www.policygrid.org/provenance-generic.owl#QuestionnaireSurvey"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#reviewComments -->
+
+    <owl:DatatypeProperty rdf:about="http://www.policygrid.org/provenance-generic.owl#reviewComments">
+        <rdfs:comment rdf:datatype="&xsd;string">Results/Comments</rdfs:comment>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#samplingError -->
+
+    <owl:DatatypeProperty rdf:about="http://www.policygrid.org/provenance-generic.owl#samplingError">
+        <rdfs:comment rdf:datatype="&xsd;string">What</rdfs:comment>
+        <rdfs:domain rdf:resource="http://www.policygrid.org/provenance-generic.owl#DataAnalysis"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#samplingProcedures -->
+
+    <owl:DatatypeProperty rdf:about="http://www.policygrid.org/provenance-generic.owl#samplingProcedures">
+        <rdfs:comment rdf:datatype="&xsd;string">How</rdfs:comment>
+        <rdfs:domain rdf:resource="http://www.policygrid.org/provenance-generic.owl#DataCollection"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#spatialUnitsOfInvestigation -->
+
+    <owl:DatatypeProperty rdf:about="http://www.policygrid.org/provenance-generic.owl#spatialUnitsOfInvestigation">
+        <rdfs:comment rdf:datatype="&xsd;string">How</rdfs:comment>
+        <rdfs:domain rdf:resource="http://www.policygrid.org/provenance-generic.owl#DataCollection"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#statisticalAnalysisUsed -->
+
+    <owl:DatatypeProperty rdf:about="http://www.policygrid.org/provenance-generic.owl#statisticalAnalysisUsed">
+        <rdfs:comment rdf:datatype="&xsd;string">How</rdfs:comment>
+        <rdfs:subPropertyOf rdf:resource="http://www.policygrid.org/provenance-generic.owl#analysisApproach"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#subtitle -->
+
+    <owl:DatatypeProperty rdf:about="http://www.policygrid.org/provenance-generic.owl#subtitle">
+        <rdfs:comment rdf:datatype="&xsd;string"></rdfs:comment>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#testResult -->
+
+    <owl:DatatypeProperty rdf:about="http://www.policygrid.org/provenance-generic.owl#testResult">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+        <rdfs:range>
+            <rdfs:Datatype>
+                <owl:oneOf>
+                    <rdf:Description>
+                        <rdf:type rdf:resource="&rdf;List"/>
+                        <rdf:first rdf:datatype="&xsd;string">fail</rdf:first>
+                        <rdf:rest>
+                            <rdf:Description>
+                                <rdf:type rdf:resource="&rdf;List"/>
+                                <rdf:first rdf:datatype="&xsd;string">pass</rdf:first>
+                                <rdf:rest rdf:resource="&rdf;nil"/>
+                            </rdf:Description>
+                        </rdf:rest>
+                    </rdf:Description>
+                </owl:oneOf>
+            </rdfs:Datatype>
+        </rdfs:range>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#timeDimension -->
+
+    <owl:DatatypeProperty rdf:about="http://www.policygrid.org/provenance-generic.owl#timeDimension">
+        <rdfs:comment rdf:datatype="&xsd;string">When</rdfs:comment>
+        <rdfs:domain rdf:resource="http://www.policygrid.org/provenance-generic.owl#DataCollection"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#title -->
+
+    <owl:DatatypeProperty rdf:about="http://www.policygrid.org/provenance-generic.owl#title">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+        <rdfs:comment rdf:datatype="&xsd;string">I&#39;VE REMOVED PROJECT FROM THE DOMAIN</rdfs:comment>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#typeOfData -->
+
+    <owl:DatatypeProperty rdf:about="http://www.policygrid.org/provenance-generic.owl#typeOfData">
+        <rdfs:comment rdf:datatype="&xsd;string">What</rdfs:comment>
+        <rdfs:domain rdf:resource="http://www.policygrid.org/provenance-generic.owl#DataAnalysis"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#typeOfFocusGroup -->
+
+    <owl:DatatypeProperty rdf:about="http://www.policygrid.org/provenance-generic.owl#typeOfFocusGroup">
+        <rdfs:comment rdf:datatype="&xsd;string">How</rdfs:comment>
+        <rdfs:domain rdf:resource="http://www.policygrid.org/provenance-generic.owl#FocusGroup"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#typeOfResearchInstrument -->
+
+    <owl:DatatypeProperty rdf:about="http://www.policygrid.org/provenance-generic.owl#typeOfResearchInstrument">
+        <rdfs:comment rdf:datatype="&xsd;string">What</rdfs:comment>
+        <rdfs:domain rdf:resource="http://www.policygrid.org/provenance-generic.owl#DataCollection"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#versionNumber -->
+
+    <owl:DatatypeProperty rdf:about="http://www.policygrid.org/provenance-generic.owl#versionNumber">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+        <rdfs:comment rdf:datatype="&xsd;string">General information</rdfs:comment>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Classes
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://openprovenance.org/ontology#Agent -->
+
+    <owl:Class rdf:about="&opm;Agent"/>
+    
+
+
+    <!-- http://openprovenance.org/ontology#Artifact -->
+
+    <owl:Class rdf:about="&opm;Artifact">
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.policygrid.org/provenance-generic.owl#title"/>
+                <owl:cardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:cardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- http://openprovenance.org/ontology#Edge -->
+
+    <owl:Class rdf:about="&opm;Edge">
+        <rdfs:subClassOf rdf:resource="&opm;Entity"/>
+    </owl:Class>
+    
+
+
+    <!-- http://openprovenance.org/ontology#Entity -->
+
+    <owl:Class rdf:about="&opm;Entity"/>
+    
+
+
+    <!-- http://openprovenance.org/ontology#Node -->
+
+    <owl:Class rdf:about="&opm;Node"/>
+    
+
+
+    <!-- http://openprovenance.org/ontology#Process -->
+
+    <owl:Class rdf:about="&opm;Process"/>
+    
+
+
+    <!-- http://openprovenance.org/ontology#Used -->
+
+    <owl:Class rdf:about="&opm;Used">
+        <rdfs:subClassOf rdf:resource="&opm;Edge"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&opm;cause"/>
+                <owl:allValuesFrom rdf:resource="&opm;Artifact"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&opm;effect"/>
+                <owl:allValuesFrom rdf:resource="&opm;Process"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- http://openprovenance.org/ontology#WasControlledBy -->
+
+    <owl:Class rdf:about="&opm;WasControlledBy">
+        <rdfs:subClassOf rdf:resource="&opm;Edge"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&opm;cause"/>
+                <owl:allValuesFrom rdf:resource="&opm;Agent"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&opm;effect"/>
+                <owl:allValuesFrom rdf:resource="&opm;Process"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- http://openprovenance.org/ontology#WasDerivedFrom -->
+
+    <owl:Class rdf:about="&opm;WasDerivedFrom">
+        <rdfs:subClassOf rdf:resource="&opm;Edge"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&opm;cause"/>
+                <owl:allValuesFrom rdf:resource="&opm;Artifact"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&opm;effect"/>
+                <owl:allValuesFrom rdf:resource="&opm;Artifact"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- http://openprovenance.org/ontology#WasGeneratedBy -->
+
+    <owl:Class rdf:about="&opm;WasGeneratedBy">
+        <rdfs:subClassOf rdf:resource="&opm;Edge"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&opm;cause"/>
+                <owl:allValuesFrom rdf:resource="&opm;Process"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&opm;effect"/>
+                <owl:allValuesFrom rdf:resource="&opm;Artifact"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- http://openprovenance.org/ontology#WasTriggeredBy -->
+
+    <owl:Class rdf:about="&opm;WasTriggeredBy">
+        <rdfs:subClassOf rdf:resource="&opm;Edge"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&opm;effect"/>
+                <owl:allValuesFrom rdf:resource="&opm;Process"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&opm;cause"/>
+                <owl:allValuesFrom rdf:resource="&opm;Process"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- http://www.geonames.org/ontology#Feature -->
+
+    <owl:Class rdf:about="&ontology;Feature"/>
+    
+
+
+    <!-- http://www.policygrid.org/project.owl#Project -->
+
+    <owl:Class rdf:about="&project;Project"/>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#Abstract -->
+
+    <owl:Class rdf:about="http://www.policygrid.org/provenance-generic.owl#Abstract">
+        <rdfs:subClassOf rdf:resource="http://www.policygrid.org/provenance-generic.owl#Paper"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.policygrid.org/provenance-generic.owl#publishedIn"/>
+                <owl:minCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:minCardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.policygrid.org/provenance-generic.owl#dateOfPublication"/>
+                <owl:minCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:minCardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#Audio -->
+
+    <owl:Class rdf:about="http://www.policygrid.org/provenance-generic.owl#Audio">
+        <rdfs:subClassOf rdf:resource="http://www.policygrid.org/provenance-generic.owl#Data"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#Coding -->
+
+    <owl:Class rdf:about="http://www.policygrid.org/provenance-generic.owl#Coding">
+        <rdfs:subClassOf rdf:resource="http://www.policygrid.org/provenance-generic.owl#DataPreparation"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#Communication -->
+
+    <owl:Class rdf:about="http://www.policygrid.org/provenance-generic.owl#Communication">
+        <rdfs:subClassOf rdf:resource="&opm;Artifact"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#ConferencePaper -->
+
+    <owl:Class rdf:about="http://www.policygrid.org/provenance-generic.owl#ConferencePaper">
+        <rdfs:subClassOf rdf:resource="http://www.policygrid.org/provenance-generic.owl#Paper"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.policygrid.org/provenance-generic.owl#presentedAtConference"/>
+                <owl:cardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:cardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#ContentAnalysis -->
+
+    <owl:Class rdf:about="http://www.policygrid.org/provenance-generic.owl#ContentAnalysis">
+        <rdfs:subClassOf rdf:resource="http://www.policygrid.org/provenance-generic.owl#DataAnalysis"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#Data -->
+
+    <owl:Class rdf:about="http://www.policygrid.org/provenance-generic.owl#Data">
+        <rdfs:subClassOf rdf:resource="&opm;Artifact"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.policygrid.org/provenance-generic.owl#depositedBy"/>
+                <owl:cardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:cardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#DataAnalysis -->
+
+    <owl:Class rdf:about="http://www.policygrid.org/provenance-generic.owl#DataAnalysis">
+        <rdfs:subClassOf rdf:resource="&opm;Process"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#DataCollection -->
+
+    <owl:Class rdf:about="http://www.policygrid.org/provenance-generic.owl#DataCollection">
+        <rdfs:subClassOf rdf:resource="&opm;Process"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.policygrid.org/provenance-generic.owl#samplingProcedures"/>
+                <owl:minCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:minCardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.policygrid.org/provenance-generic.owl#timePeriodCovered"/>
+                <owl:minCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:minCardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#DataEntry -->
+
+    <owl:Class rdf:about="http://www.policygrid.org/provenance-generic.owl#DataEntry">
+        <rdfs:subClassOf rdf:resource="http://www.policygrid.org/provenance-generic.owl#Coding"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#DataPreparation -->
+
+    <owl:Class rdf:about="http://www.policygrid.org/provenance-generic.owl#DataPreparation">
+        <rdfs:subClassOf rdf:resource="&opm;Process"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#Design -->
+
+    <owl:Class rdf:about="http://www.policygrid.org/provenance-generic.owl#Design">
+        <rdfs:subClassOf rdf:resource="&opm;Process"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#Diary -->
+
+    <owl:Class rdf:about="http://www.policygrid.org/provenance-generic.owl#Diary">
+        <rdfs:subClassOf rdf:resource="http://www.policygrid.org/provenance-generic.owl#Documentation"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#Dissemination -->
+
+    <owl:Class rdf:about="http://www.policygrid.org/provenance-generic.owl#Dissemination">
+        <rdfs:subClassOf rdf:resource="&opm;Process"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#Documentation -->
+
+    <owl:Class rdf:about="http://www.policygrid.org/provenance-generic.owl#Documentation">
+        <rdfs:subClassOf rdf:resource="&opm;Artifact"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.policygrid.org/provenance-generic.owl#hasAuthor"/>
+                <owl:minCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:minCardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#Experiment -->
+
+    <owl:Class rdf:about="http://www.policygrid.org/provenance-generic.owl#Experiment">
+        <rdfs:subClassOf rdf:resource="http://www.policygrid.org/provenance-generic.owl#DataCollection"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#FinalReport -->
+
+    <owl:Class rdf:about="http://www.policygrid.org/provenance-generic.owl#FinalReport">
+        <rdfs:subClassOf rdf:resource="http://www.policygrid.org/provenance-generic.owl#PublishedReport"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#FocusGroup -->
+
+    <owl:Class rdf:about="http://www.policygrid.org/provenance-generic.owl#FocusGroup">
+        <rdfs:subClassOf rdf:resource="http://www.policygrid.org/provenance-generic.owl#DataCollection"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.policygrid.org/provenance-generic.owl#interpretativeMethodsUsed"/>
+                <owl:minCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:minCardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#GrantApplication -->
+
+    <owl:Class rdf:about="http://www.policygrid.org/provenance-generic.owl#GrantApplication">
+        <rdfs:subClassOf rdf:resource="http://www.policygrid.org/provenance-generic.owl#ProjectDevelopment"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#Image -->
+
+    <owl:Class rdf:about="http://www.policygrid.org/provenance-generic.owl#Image">
+        <rdfs:subClassOf rdf:resource="http://www.policygrid.org/provenance-generic.owl#Data"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#Interview -->
+
+    <owl:Class rdf:about="http://www.policygrid.org/provenance-generic.owl#Interview">
+        <rdfs:subClassOf rdf:resource="http://www.policygrid.org/provenance-generic.owl#DataCollection"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#JournalPaper -->
+
+    <owl:Class rdf:about="http://www.policygrid.org/provenance-generic.owl#JournalPaper">
+        <rdfs:subClassOf rdf:resource="http://www.policygrid.org/provenance-generic.owl#Paper"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#LiteratureReview -->
+
+    <owl:Class rdf:about="http://www.policygrid.org/provenance-generic.owl#LiteratureReview">
+        <rdfs:subClassOf rdf:resource="http://www.policygrid.org/provenance-generic.owl#ProjectDevelopment"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#Manual -->
+
+    <owl:Class rdf:about="http://www.policygrid.org/provenance-generic.owl#Manual">
+        <rdfs:subClassOf rdf:resource="http://www.policygrid.org/provenance-generic.owl#Documentation"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#Notes -->
+
+    <owl:Class rdf:about="http://www.policygrid.org/provenance-generic.owl#Notes">
+        <rdfs:subClassOf rdf:resource="http://www.policygrid.org/provenance-generic.owl#Data"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#Ontology -->
+
+    <owl:Class rdf:about="http://www.policygrid.org/provenance-generic.owl#Ontology">
+        <rdfs:subClassOf rdf:resource="http://www.policygrid.org/provenance-generic.owl#Data"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#Paper -->
+
+    <owl:Class rdf:about="http://www.policygrid.org/provenance-generic.owl#Paper">
+        <rdfs:subClassOf rdf:resource="&opm;Artifact"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.policygrid.org/provenance-generic.owl#hasAuthor"/>
+                <owl:minCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:minCardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#Presentation -->
+
+    <owl:Class rdf:about="http://www.policygrid.org/provenance-generic.owl#Presentation">
+        <rdfs:subClassOf rdf:resource="&opm;Artifact"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.policygrid.org/provenance-generic.owl#presentedBy"/>
+                <owl:minCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:minCardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#ProjectDevelopment -->
+
+    <owl:Class rdf:about="http://www.policygrid.org/provenance-generic.owl#ProjectDevelopment">
+        <rdfs:subClassOf rdf:resource="&opm;Process"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#PublishedReport -->
+
+    <owl:Class rdf:about="http://www.policygrid.org/provenance-generic.owl#PublishedReport">
+        <rdfs:subClassOf rdf:resource="http://www.policygrid.org/provenance-generic.owl#Report"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.policygrid.org/provenance-generic.owl#dateOfPublication"/>
+                <owl:minCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:minCardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.policygrid.org/provenance-generic.owl#publishedIn"/>
+                <owl:minCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:minCardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#Questionnaire -->
+
+    <owl:Class rdf:about="http://www.policygrid.org/provenance-generic.owl#Questionnaire">
+        <rdfs:subClassOf rdf:resource="http://www.policygrid.org/provenance-generic.owl#Data"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#QuestionnaireSurvey -->
+
+    <owl:Class rdf:about="http://www.policygrid.org/provenance-generic.owl#QuestionnaireSurvey">
+        <rdfs:subClassOf rdf:resource="http://www.policygrid.org/provenance-generic.owl#DataCollection"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.policygrid.org/provenance-generic.owl#responseRate"/>
+                <owl:minCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:minCardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#Report -->
+
+    <owl:Class rdf:about="http://www.policygrid.org/provenance-generic.owl#Report">
+        <rdfs:subClassOf rdf:resource="&opm;Artifact"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.policygrid.org/provenance-generic.owl#hasAuthor"/>
+                <owl:minCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:minCardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#Reporting -->
+
+    <owl:Class rdf:about="http://www.policygrid.org/provenance-generic.owl#Reporting">
+        <rdfs:subClassOf rdf:resource="http://www.policygrid.org/provenance-generic.owl#Dissemination"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#ResearchDiary -->
+
+    <owl:Class rdf:about="http://www.policygrid.org/provenance-generic.owl#ResearchDiary">
+        <rdfs:subClassOf rdf:resource="http://www.policygrid.org/provenance-generic.owl#DataCollection"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#ResourceCollection -->
+
+    <owl:Class rdf:about="http://www.policygrid.org/provenance-generic.owl#ResourceCollection">
+        <rdfs:subClassOf rdf:resource="&p1;Collection"/>
+        <rdfs:comment rdf:datatype="&xsd;string">Collection of resources</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#Screening -->
+
+    <owl:Class rdf:about="http://www.policygrid.org/provenance-generic.owl#Screening">
+        <rdfs:subClassOf rdf:resource="http://www.policygrid.org/provenance-generic.owl#ProjectDevelopment"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#StatisticalAnalysis -->
+
+    <owl:Class rdf:about="http://www.policygrid.org/provenance-generic.owl#StatisticalAnalysis">
+        <rdfs:subClassOf rdf:resource="http://www.policygrid.org/provenance-generic.owl#DataAnalysis"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#StatisticalData -->
+
+    <owl:Class rdf:about="http://www.policygrid.org/provenance-generic.owl#StatisticalData">
+        <rdfs:subClassOf rdf:resource="http://www.policygrid.org/provenance-generic.owl#Data"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#Summary -->
+
+    <owl:Class rdf:about="http://www.policygrid.org/provenance-generic.owl#Summary">
+        <rdfs:subClassOf rdf:resource="http://www.policygrid.org/provenance-generic.owl#PublishedReport"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#TabulatedData -->
+
+    <owl:Class rdf:about="http://www.policygrid.org/provenance-generic.owl#TabulatedData">
+        <rdfs:subClassOf rdf:resource="http://www.policygrid.org/provenance-generic.owl#Data"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#Thesis -->
+
+    <owl:Class rdf:about="http://www.policygrid.org/provenance-generic.owl#Thesis">
+        <rdfs:subClassOf rdf:resource="http://www.policygrid.org/provenance-generic.owl#Paper"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#Transcribing -->
+
+    <owl:Class rdf:about="http://www.policygrid.org/provenance-generic.owl#Transcribing">
+        <rdfs:subClassOf rdf:resource="http://www.policygrid.org/provenance-generic.owl#DataPreparation"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#Transcript -->
+
+    <owl:Class rdf:about="http://www.policygrid.org/provenance-generic.owl#Transcript">
+        <rdfs:subClassOf rdf:resource="http://www.policygrid.org/provenance-generic.owl#Data"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#UnpublishedPaper -->
+
+    <owl:Class rdf:about="http://www.policygrid.org/provenance-generic.owl#UnpublishedPaper">
+        <rdfs:subClassOf rdf:resource="http://www.policygrid.org/provenance-generic.owl#Paper"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#UnpublishedReport -->
+
+    <owl:Class rdf:about="http://www.policygrid.org/provenance-generic.owl#UnpublishedReport">
+        <rdfs:subClassOf rdf:resource="http://www.policygrid.org/provenance-generic.owl#Report"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.policygrid.org/provenance-generic.owl#Video -->
+
+    <owl:Class rdf:about="http://www.policygrid.org/provenance-generic.owl#Video">
+        <rdfs:subClassOf rdf:resource="http://www.policygrid.org/provenance-generic.owl#Data"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.policygrid.org/utility.owl#Address -->
+
+    <owl:Class rdf:about="&p1;Address"/>
+    
+
+
+    <!-- http://www.policygrid.org/utility.owl#Collection -->
+
+    <owl:Class rdf:about="&p1;Collection"/>
+    
+
+
+    <!-- http://www.policygrid.org/utility.owl#Department -->
+
+    <owl:Class rdf:about="&p1;Department"/>
+    
+
+
+    <!-- http://www.policygrid.org/utility.owl#Organisation -->
+
+    <owl:Class rdf:about="&p1;Organisation"/>
+    
+
+
+    <!-- http://www.w3.org/2001/XMLSchema#string -->
+
+    <owl:Class rdf:about="&xsd;string"/>
+    
+
+
+    <!-- http://www.w3.org/2002/07/owl#Datatype -->
+
+    <owl:Class rdf:about="&owl;Datatype"/>
+    
+
+
+    <!-- http://www.w3.org/2002/07/owl#Thing -->
+
+    <owl:Class rdf:about="&owl;Thing"/>
+    
+
+
+    <!-- http://www.w3.org/2006/time#Instant -->
+
+    <owl:Class rdf:about="&time;Instant"/>
+    
+
+
+    <!-- http://xmlns.com/foaf/0.1/OnlineAccount -->
+
+    <owl:Class rdf:about="&ff;OnlineAccount"/>
+    
+
+
+    <!-- http://xmlns.com/foaf/0.1/Person -->
+
+    <owl:Class rdf:about="&ff;Person">
+        <rdfs:subClassOf rdf:resource="&opm;Agent"/>
+    </owl:Class>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Datatype"/>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Datatype"/>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Datatype"/>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Datatype"/>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Datatype"/>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Datatype"/>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Datatype"/>
+    </rdf:Description>
+</rdf:RDF>
+
+
+
+<!-- Generated by the OWL API (version 3.0.0.1413) http://owlapi.sourceforge.net -->
+
