@@ -104,10 +104,10 @@ public class ProvenanceService  extends javax.servlet.http.HttpServlet implement
 		
 		namespace = Properties.getString("namespace");
 		sessions = new HashMap<String, Model>();
-		getBasicTypes().put("http://openprovenance.org/ontology#Process", "Process");
-		getBasicTypes().put("http://openprovenance.org/ontology#Agent", "Agent");
-		getBasicTypes().put("http://openprovenance.org/ontology#Artifact", "Artifact");
-		Vector<String> subClasses = RDFProvider.getSubclasses(  "http://openprovenance.org/ontology#Edge");
+		getBasicTypes().put(Properties.getString("process"), "Process");
+		getBasicTypes().put(Properties.getString("agent"), "Agent");
+		getBasicTypes().put(Properties.getString("artifact"), "Artifact");
+		Vector<String> subClasses = RDFProvider.getSubclasses(Properties.getString("edge"));
 		properties.addAll(subClasses);
 		for(int i=0;i<properties.size();i++){
 			subClasses = RDFProvider.getSubclasses(  properties.get(i));
@@ -422,7 +422,7 @@ public class ProvenanceService  extends javax.servlet.http.HttpServlet implement
 		if(model == null)
 			return "Error - no such process in queue"+sessionId;
 		
-		String instanceId = "http://www.policygrid.org/ourspacesVRE.owl#" + UUID.randomUUID().toString();
+		String instanceId = namespace + UUID.randomUUID().toString();
 		Resource res = model.createResource(instanceId);
 		model.createResource(type);
 		model.add(res, RDF.type, model.createResource(type));
@@ -434,7 +434,7 @@ public class ProvenanceService  extends javax.servlet.http.HttpServlet implement
 	 * @return URI of the new process.
 	 */
 	public static String addProcess(String sessionId){		
-		return addNode(sessionId, "http://openprovenance.org/ontology#Process");		
+		return addNode(sessionId, Properties.getString("process"));		
 	}
 	
 
@@ -443,7 +443,7 @@ public class ProvenanceService  extends javax.servlet.http.HttpServlet implement
 	 * @return URI of the new artifact.
 	 */
 	public static String addAgent(String sessionId){
-		return addNode(sessionId, "http://openprovenance.org/ontology#Agent");
+		return addNode(sessionId, Properties.getString("agent"));
 	}
 
 	
@@ -452,7 +452,7 @@ public class ProvenanceService  extends javax.servlet.http.HttpServlet implement
 	 * @return URI of the new artifact.
 	 */
 	public static String addArtifact(String sessionId){
-		return addNode(sessionId,"http://openprovenance.org/ontology#Artifact");
+		return addNode(sessionId,Properties.getString("artifact"));
 	}
 	
 
@@ -510,7 +510,7 @@ public class ProvenanceService  extends javax.servlet.http.HttpServlet implement
 	 */
 	public static String addCausalRelationship(String sessionId,String type, String cause,  String effect){		
 		Model model = sessions.get(sessionId);
-		String relationId = "http://www.policygrid.org/ourspacesVRE.owl#" + UUID.randomUUID().toString();
+		String relationId = namespace + UUID.randomUUID().toString();
 
 		if(model == null)
 			return "Error - no such process in queue "+sessionId;
