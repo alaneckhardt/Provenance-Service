@@ -177,12 +177,12 @@ public class RDFProvider {
 		try {
 			List<String> adjacencies = null;
 			if(to==0)
-				adjacencies = getPropertiesTo(n.getId(), Properties.getString("to"));
+				adjacencies = getPropertiesTo(n.getId(), Properties.getString("cause"));
 			else if(to==1)
-				adjacencies = getPropertiesTo(n.getId(), Properties.getString("from"));
+				adjacencies = getPropertiesTo(n.getId(), Properties.getString("effect"));
 			else if(to==2){
-				adjacencies = getPropertiesTo(n.getId(), Properties.getString("from"));
-				adjacencies.addAll(getPropertiesTo(n.getId(), Properties.getString("to")));
+				adjacencies = getPropertiesTo(n.getId(), Properties.getString("cause"));
+				adjacencies.addAll(getPropertiesTo(n.getId(), Properties.getString("effect")));
 			}
 			else
 				return;
@@ -292,15 +292,15 @@ public class RDFProvider {
 			e.setType(t.getObject().toString());
 		
 		if (g != null)
-			e.setFrom(g.getNode(edge.getProperty(getProp("from")).getResource().getURI()));
+			e.setFrom(g.getNode(edge.getProperty(getProp("cause")).getResource().getURI()));
 		if (e.getFrom() == null) {
-			e.setFrom(getNode(g, edge.getProperty(getProp("from")).getResource()));
+			e.setFrom(getNode(g, edge.getProperty(getProp("cause")).getResource()));
 		}
 		
 		if (g != null)
-			e.setTo(g.getNode(edge.getProperty(getProp("to")).getResource().getURI()));
+			e.setTo(g.getNode(edge.getProperty(getProp("effect")).getResource().getURI()));
 		if (e.getTo() == null) {
-			e.setTo(getNode(g, edge.getProperty(getProp("to")).getResource()));
+			e.setTo(getNode(g, edge.getProperty(getProp("effect")).getResource()));
 		}
 		
 		//Add the edge only if everything's all right
@@ -327,14 +327,14 @@ public class RDFProvider {
 			return null;
 		Edge edge = new Edge(resource);
 		edge.setType(getProperty(resource, Properties.getString("type")));
-		String from = getProperty(resource, Properties.getString("from"));
+		String from = getProperty(resource, Properties.getString("effect"));
 		if (g != null)
 			edge.setFrom(g.getNode(from));
 		if (edge.getFrom() == null) {
 			edge.setFrom(getNode(g, from));
 		}
 
-		String to = getProperty(resource, Properties.getString("to"));
+		String to = getProperty(resource, Properties.getString("cause"));
 		if (g != null)
 			edge.setTo(g.getNode(to));
 		if (edge.getTo() == null) {
@@ -389,8 +389,8 @@ public class RDFProvider {
 			if(e.getTo().getTitle() != null)
 				m.add(n2, getProp("title"), e.getTo().getTitle());
 			
-			m.add(edge, getProp("from"), n1);
-			m.add(edge, getProp("to"), n2);					
+			m.add(edge, getProp("effect"), n1);
+			m.add(edge, getProp("cause"), n2);					
 		}
 		return m;
 	}
@@ -409,8 +409,8 @@ public class RDFProvider {
 		m.add(edge, RDF.type, m.createResource(e.getType()));
 		Resource n1 = m.createResource(e.getFrom().getId());
 		Resource n2 = m.createResource(e.getTo().getId());
-		m.add(edge, getProp("from"), n1);
-		m.add(edge, getProp("to"), n2);			
+		m.add(edge, getProp("effect"), n1);
+		m.add(edge, getProp("cause"), n2);			
 		return m;
 	}
 	/**

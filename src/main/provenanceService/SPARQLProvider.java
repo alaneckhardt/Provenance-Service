@@ -61,8 +61,8 @@ public class SPARQLProvider {
 	 */
 	public static StringBuilder getEdgeSPARQL(Edge e){	
 		StringBuilder edge = new StringBuilder(); 
-		edge.append(getTriple(e.getId(),Properties.getString("to"),e.getTo().getId()));	
-		edge.append(getTriple(e.getId(),Properties.getString("from"),e.getFrom().getId()));			
+		edge.append(getTriple(e.getId(),Properties.getString("cause"),e.getTo().getId()));	
+		edge.append(getTriple(e.getId(),Properties.getString("effect"),e.getFrom().getId()));			
 		edge.append(getTriple(e.getId(),RDF.type.getURI(),e.getType()));
 		for (String name : e.getProperties().keySet()) {
 			Object value = e.getProperty(name);

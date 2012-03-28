@@ -519,8 +519,8 @@ public class ProvenanceService  extends javax.servlet.http.HttpServlet implement
 		Resource e = model.getResource(effect);
 		Resource r = model.getResource(type);
 		model.add(relationship, RDF.type, r);
-		model.add(relationship, RDFProvider.getProp("from"), c);
-		model.add(relationship, RDFProvider.getProp("to"), e);
+		model.add(relationship, RDFProvider.getProp("cause"), c);
+		model.add(relationship, RDFProvider.getProp("effect"), e);
 		return relationship.getURI();
 	}
 	
