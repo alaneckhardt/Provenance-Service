@@ -60,7 +60,7 @@ public class TestSPARQLProvider extends TestCase {
 	public void testGetGraphSPARQL(){
 		try {
 			Graph g = AllTests.getTestGraph();
-			StringBuilder graph = SPARQLProvider.getGraphSPARQL(g);
+			StringBuilder graph = SPARQLProvider.getGraphSPARQL(g, true);
 			assertTrue(graph != null);
 			assertTrue(graph.toString().contains(g.get(0).getId()));
 			assertTrue(graph.toString().contains(g.get(1).getId()));
