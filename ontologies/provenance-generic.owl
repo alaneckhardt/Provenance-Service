@@ -1206,17 +1206,26 @@
 
     <!-- http://openprovenance.org/ontology#Agent -->
 
-    <owl:Class rdf:about="&opm;Agent"/>
+    <owl:Class rdf:about="&opm;Agent">    
+        <rdfs:subClassOf rdf:resource="http://purl.org/net/opmv/Agent"/>
+    </owl:Class>
     
 
 
     <!-- http://openprovenance.org/ontology#Artifact -->
 
-    <owl:Class rdf:about="&opm;Artifact">
+    <owl:Class rdf:about="&opm;Artifact">    
+        <rdfs:subClassOf rdf:resource="http://purl.org/net/opmv/Artifact"/>
         <rdfs:subClassOf>
             <owl:Restriction>
                 <owl:onProperty rdf:resource="http://www.policygrid.org/provenance-generic.owl#title"/>
                 <owl:cardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:cardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://purl.org/net/opmv/ns#wasGeneratedBy"/>
+                <owl:minCardinality rdf:datatype="&xsd;nonNegativeInteger">0</owl:minCardinality>
             </owl:Restriction>
         </rdfs:subClassOf>
     </owl:Class>
@@ -1245,9 +1254,25 @@
 
     <!-- http://openprovenance.org/ontology#Process -->
 
-    <owl:Class rdf:about="&opm;Process"/>
+    <owl:Class rdf:about="&opm;Process">    
+        <rdfs:subClassOf rdf:resource="http://purl.org/net/opmv/ns#Process"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.policygrid.org/provenance-generic.owl#title"/>
+                <owl:cardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:cardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    <owl:Class rdf:about="&opm;Artifact">    
+        <rdfs:subClassOf rdf:resource="http://purl.org/net/opmv/ns#Artifact"/>
+    </owl:Class>
+    <owl:Class rdf:about="&opm;Agent">    
+        <rdfs:subClassOf rdf:resource="http://purl.org/net/opmv/ns#Agent"/>
+    </owl:Class>
     
-
+    <!-- <owl:Class rdf:about="http://purl.org/net/opmv/ns#Process">
+        <rdfs:subClassOf rdf:resource="&opm;Process"/>
+    </owl:Class>-->
 
     <!-- http://openprovenance.org/ontology#Used -->
 
@@ -1357,8 +1382,14 @@
 
     <!-- http://www.policygrid.org/project.owl#Project -->
 
-    <owl:Class rdf:about="&project;Project"/>
+    <owl:Class rdf:about="&project;Project">    
+        <rdfs:subClassOf rdf:resource="&opm;Node"/>
+    </owl:Class>
     
+    
+    <owl:Class rdf:about="http://www.policygrid.org/provenance-generic.owl#Cited">
+        <rdfs:subClassOf rdf:resource="&opm;Used"/>
+    </owl:Class>
 
 
     <!-- http://www.policygrid.org/provenance-generic.owl#Abstract -->
@@ -1625,6 +1656,12 @@
             <owl:Restriction>
                 <owl:onProperty rdf:resource="http://www.policygrid.org/provenance-generic.owl#hasAuthor"/>
                 <owl:minCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:minCardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.policygrid.org/ourspacesVRE.owl#hasDisciplineInfo"/>
+                <owl:minCardinality rdf:datatype="&xsd;nonNegativeInteger">0</owl:minCardinality>
             </owl:Restriction>
         </rdfs:subClassOf>
     </owl:Class>

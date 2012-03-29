@@ -19,6 +19,7 @@ import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.query.QueryLanguage;
 import org.openrdf.query.TupleQuery;
 import org.openrdf.query.TupleQueryResult;
+import org.openrdf.query.Update;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
@@ -86,6 +87,28 @@ public class RDFProvider {
 				
 			}
 		}
+	}
+
+	public static void delete(List<String> uris) throws OpenRDFException, IOException {
+		connect();		
+		for(String s : uris){
+			Node n = RDFProvider.getNode(null, s);
+			Edge e = RDFProvider.getEdge(null, s);
+			String query;
+			if(n.getBasicType() != null)
+				query = SPARQLProvider.getNodeSPARQL(n).toString();
+			else
+				query = SPARQLProvider.getEdgeSPARQL(e).toString();
+			query = "DELETE DATA { " + query + " }";
+			Update up = getCon().prepareUpdate(org.openrdf.query.QueryLanguage.SPARQL, query);
+			up.execute();
+		}
+		disconnect();		
+	}
+	public static void delete(Model delete) throws OpenRDFException, IOException {
+		connect();		
+		getCon().prepareUpdate(org.openrdf.query.QueryLanguage.SPARQL, SPARQLProvider.getGraphSPARQL(getModelGraph(delete),false).toString());
+		disconnect();		
 	}
 	
 	public static void write(Model m) throws OpenRDFException, IOException {

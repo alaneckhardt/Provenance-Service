@@ -89,6 +89,7 @@ public class ProvenanceService  extends javax.servlet.http.HttpServlet implement
 	
 	/**Contains RDF model for URI of processes. Used for validation of correctness of the model. The model is flushed into RDF repository in the commit method.*/
 	private static Map<String, Model> sessions = null;
+	private static Map<String, List<String>> sessionsDelete = null;
 	/**Contains mapping from subclasses to Agent, Artifact, Process.*/
 	private static Map<String, String> basicTypes = new HashMap<String, String>();
 	private static List<String> properties = new ArrayList<String>();
@@ -104,6 +105,7 @@ public class ProvenanceService  extends javax.servlet.http.HttpServlet implement
 		
 		namespace = Properties.getString("namespace");
 		sessions = new HashMap<String, Model>();
+		sessionsDelete = new HashMap<String, List<String>>();
 		getBasicTypes().put(Properties.getString("process"), "Process");
 		getBasicTypes().put(Properties.getString("agent"), "Agent");
 		getBasicTypes().put(Properties.getString("artifact"), "Artifact");
@@ -237,14 +239,13 @@ public class ProvenanceService  extends javax.servlet.http.HttpServlet implement
 			object = URLDecoder.decode(object, "UTF-8");
 			session = URLDecoder.decode(session, "UTF-8");
 			title = URLDecoder.decode(title, "UTF-8");
-			session = URLDecoder.decode(session, "UTF-8");
 			output = addTitle(session, object, title);			
 		}		
 		else if("removeCausalRelationShip".equals(action)){
 			String session = request.getParameter("session");
 			session = URLDecoder.decode(session, "UTF-8");
 			String relation = request.getParameter("relation");
-			relation = URLDecoder.decode(session, "UTF-8");
+			relation = URLDecoder.decode(relation, "UTF-8");
 			output = removeCausalRelationShip(session, relation);			
 		}		
 		else if("removeNode".equals(action)){
@@ -289,7 +290,7 @@ public class ProvenanceService  extends javax.servlet.http.HttpServlet implement
 			String session = request.getParameter("session");
 			session = URLDecoder.decode(session, "UTF-8");	
 			Graph g = getGraph(session);
-			output = SPARQLProvider.getGraphSPARQL(g).toString();	
+			output = SPARQLProvider.getGraphSPARQL(g, true).toString();	
 		}
 		else if("getProvenance".equals(action)){
 			String resource = request.getParameter("resource");
@@ -612,7 +613,14 @@ public class ProvenanceService  extends javax.servlet.http.HttpServlet implement
 	public static String removeCausalRelationShip(String sessionId, String relationship){
 		Model model = sessions.get(sessionId);
 		Resource relation = model.getResource(relationship);
-		model.remove(relation.listProperties());		
+		
+		if(model.contains(relation, RDF.type))
+			model.remove(relation.listProperties());
+		else{
+			if(sessionsDelete.get(sessionId) == null)
+				sessionsDelete.put(sessionId, new ArrayList<String>());
+			sessionsDelete.get(sessionId).add(relationship);
+		}
 		return "ok";
 	}
 	/**
@@ -624,7 +632,13 @@ public class ProvenanceService  extends javax.servlet.http.HttpServlet implement
 	public static String removeNode(String sessionId, String node){
 		Model model = sessions.get(sessionId);
 		Resource res = model.getResource(node);
-		model.remove(res.listProperties());
+		if(model.contains(res, RDF.type))
+			model.remove(res.listProperties());
+		else{
+			if(sessionsDelete.get(sessionId) == null)
+				sessionsDelete.put(sessionId, new ArrayList<String>());
+			sessionsDelete.get(sessionId).add(node);
+		}
 		return "ok";
 	}
 	
@@ -659,6 +673,9 @@ public class ProvenanceService  extends javax.servlet.http.HttpServlet implement
 		Model m = sessions.get(sessionId);
 		try {
 			RDFProvider.write(m);
+			if(sessionsDelete.get(sessionId) != null){
+				RDFProvider.delete(sessionsDelete.get(sessionId));
+			}
 		} catch (OpenRDFException e) {
 			e.printStackTrace();
 			throw e;

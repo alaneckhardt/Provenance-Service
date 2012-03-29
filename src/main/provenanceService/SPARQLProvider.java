@@ -75,10 +75,13 @@ public class SPARQLProvider {
 	 * @param g
 	 * @return
 	 */
-	public static StringBuilder getGraphSPARQL(Graph g){
+	public static StringBuilder getGraphSPARQL(Graph g, boolean insert){
+		String action = "INSERT";
+		if(!insert)
+			action = "DELETE";
 		StringBuilder graph = new StringBuilder();
 		List<String> edgesInserted = new ArrayList<String>();
-		graph.append("INSERT DATA {\n");
+		graph.append(action+" DATA {\n");
 		for (int i = 0; g != null && i < g.size(); i++) {
 			Node n = g.get(i);
 			StringBuilder s = getNodeSPARQL(n);
