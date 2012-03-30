@@ -467,7 +467,7 @@ public class ProvenanceService  extends javax.servlet.http.HttpServlet implement
 		System.out.println(sessionId+","+object+","+title);
 		Model model = sessions.get(sessionId);
 		if(model == null)
-			return "Error - no such process in queue "+sessionId;
+			return "Error - no session "+sessionId;
 		Resource res = model.getResource(object);
 		Property p = model.getProperty(Properties.getString("title"));
 		if(p==null){
@@ -514,7 +514,7 @@ public class ProvenanceService  extends javax.servlet.http.HttpServlet implement
 		String relationId = namespace + UUID.randomUUID().toString();
 
 		if(model == null)
-			return "Error - no such process in queue "+sessionId;
+			return "Error - no session "+sessionId;
 		Resource relationship = model.createResource(relationId);
 		Resource c = model.getResource(cause);
 		Resource e = model.getResource(effect);
@@ -552,7 +552,7 @@ public class ProvenanceService  extends javax.servlet.http.HttpServlet implement
 	public static String addExistingResource(String sessionId, String uri, String type, String title){		
 		Model model = sessions.get(sessionId);
 		if(model == null)
-			return "Error - no such process in queue "+sessionId;
+			return "Error - no session "+sessionId;
 		model.add(model.getResource(uri), RDF.type, model.getResource(type));
 		if(title != null && title.length()>0)
 			addTitle(sessionId, uri, title);
@@ -671,6 +671,8 @@ public class ProvenanceService  extends javax.servlet.http.HttpServlet implement
 	 */
 	public static String commit(String sessionId) throws OpenRDFException, IOException {
 		Model m = sessions.get(sessionId);
+		if(m == null)
+			return "Error - no session "+sessionId;
 		try {
 			RDFProvider.write(m);
 			if(sessionsDelete.get(sessionId) != null){
