@@ -122,6 +122,23 @@ public class RDFProvider {
 	}
 	
 
+	public static Vector<String> getSubclasses(String type, boolean direct) {
+		Vector<String> classList = new Vector<String>();
+		OntClass c = ontologies.getOntClass(type);
+		if(c == null)
+			return classList;
+		try {
+			//Do it write because of iterators possible conflict.
+			ontologies.enterCriticalSection(Lock.WRITE);
+			for (Iterator<OntClass> it = c.listSubClasses(direct); it.hasNext();) {
+				OntClass sc = (OntClass) it.next();
+				classList.add(sc.getURI());
+			}
+		} finally {
+			ontologies.leaveCriticalSection() ;
+		}
+		return classList;
+	}
 	public static Vector<String> getSubclasses(String type) {
 		Vector<String> classList = new Vector<String>();
 		OntClass c = ontologies.getOntClass(type);
