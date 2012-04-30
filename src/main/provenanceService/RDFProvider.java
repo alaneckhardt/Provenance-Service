@@ -52,9 +52,16 @@ public class RDFProvider {
 	/**List of custom properties to load.*/
 	private static List<String> customProperties;
 	@SuppressWarnings("unchecked")
-	public static void init(){
+	public static void init() {
+		
 		System.setProperty("http.proxyHost", Properties.getString("proxyhost"));
 		System.setProperty("http.proxyPort", Properties.getString("proxyport"));
+		try {
+			connect();
+		} catch (RepositoryException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		//customProperties = new ArrayList<String>();
 		customProperties = Properties.getValues().getList("customProperties");
 		
@@ -90,7 +97,7 @@ public class RDFProvider {
 	}
 
 	public static void delete(List<String> uris) throws OpenRDFException, IOException {
-		connect();		
+		//connect();		
 		for(String s : uris){
 			Node n = RDFProvider.getNode(null, s);
 			Edge e = RDFProvider.getEdge(null, s);
@@ -103,22 +110,22 @@ public class RDFProvider {
 			Update up = getCon().prepareUpdate(org.openrdf.query.QueryLanguage.SPARQL, query);
 			up.execute();
 		}
-		disconnect();		
+		//disconnect();		
 	}
 	public static void delete(Model delete) throws OpenRDFException, IOException {
-		connect();		
+		//connect();		
 		getCon().prepareUpdate(org.openrdf.query.QueryLanguage.SPARQL, SPARQLProvider.getGraphSPARQL(getModelGraph(delete),false).toString());
-		disconnect();		
+		//disconnect();		
 	}
 	
 	public static void write(Model m) throws OpenRDFException, IOException {
-		connect();
+		//connect();
 		//TODO policies handling and validation
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		m.write(out);
 		InputStream in = new ByteArrayInputStream(out.toByteArray());
 		getCon().add(in, Properties.getString("url"), RDFFormat.RDFXML);
-		disconnect();		
+		//disconnect();		
 	}
 	
 
@@ -367,21 +374,21 @@ public class RDFProvider {
 			return null;
 		Edge edge = new Edge(resource);
 		edge.setType(getProperty(resource, Properties.getString("type")));
-		String from = getProperty(resource, Properties.getString("effect"));
+		String from = getProperty(resource, Properties.getString("cause"));
 		if (g != null)
 			edge.setFrom(g.getNode(from));
 		if (edge.getFrom() == null) {
 			edge.setFrom(getNode(g, from));
 		}
 
-		String to = getProperty(resource, Properties.getString("cause"));
+		String to = getProperty(resource, Properties.getString("effect"));
 		if (g != null)
 			edge.setTo(g.getNode(to));
 		if (edge.getTo() == null) {
 			edge.setTo(getNode(g, to));
 		}
 		if ((edge.getType() == null || edge.getType().equals(""))
-				&& (edge.getFrom() == null || edge.getTo() == null))
+				|| (edge.getFrom() == null || edge.getTo() == null))
 			return null;
 		return edge;			
 	}
@@ -423,19 +430,65 @@ public class RDFProvider {
 				m.add(n1, RDF.type, m.createResource(e.getFrom().getType()));			
 			if(e.getFrom().getTitle() != null)
 				m.add(n1, getProp("title"), e.getFrom().getTitle());
+			m.add(edge, getProp("cause"), n1);
 			
 			if(e.getTo().getType() != null)
 				m.add(n2, RDF.type, m.createResource(e.getTo().getType()));
 			if(e.getTo().getTitle() != null)
-				m.add(n2, getProp("title"), e.getTo().getTitle());
-			
-			m.add(edge, getProp("effect"), n1);
-			m.add(edge, getProp("cause"), n2);					
+				m.add(n2, getProp("title"), e.getTo().getTitle());			
+			m.add(edge, getProp("effect"), n2);					
 		}
 		return m;
 	}
 	public static Property getProp(String prop){
 		return ResourceFactory.createProperty(Properties.getString(prop));
+	}
+	
+	public static Graph getAllProvenance(){
+		List<String> individuals = new ArrayList<String>();
+		for(String c : ProvenanceService.getNodes()){
+			try {
+				individuals.addAll(getPropertiesTo(c, "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"));
+			} catch (RepositoryException e) {
+				e.printStackTrace();
+			} catch (QueryEvaluationException e) {
+				e.printStackTrace();
+			} catch (MalformedQueryException e) {
+				e.printStackTrace();
+			}
+		}
+		List<String> edges = new ArrayList<String>();
+		for(String c : ProvenanceService.getProperties()){
+			try {
+				edges.addAll(getPropertiesTo(c, "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"));
+			} catch (RepositoryException e) {
+				e.printStackTrace();
+			} catch (QueryEvaluationException e) {
+				e.printStackTrace();
+			} catch (MalformedQueryException e) {
+				e.printStackTrace();
+			}
+		}
+		Graph g = new Graph();
+		for(String ind : individuals){
+			Node n;
+			try {
+				n = getNode(g, ind);
+				g.addNode(n);
+			} catch (OpenRDFException e) {
+				e.printStackTrace();
+			}
+		}
+		for(String ind : edges){
+			Edge e;
+			try {
+				e = getEdge(g, ind);
+				g.addEdge(e);
+			} catch (OpenRDFException e2) {
+				e2.printStackTrace();
+			}
+		}
+		return g;
 	}
 
 	/**
@@ -448,9 +501,10 @@ public class RDFProvider {
 		Resource edge = m.createResource(e.getId());
 		m.add(edge, RDF.type, m.createResource(e.getType()));
 		Resource n1 = m.createResource(e.getFrom().getId());
+		m.add(edge, getProp("cause"), n1);
+		
 		Resource n2 = m.createResource(e.getTo().getId());
-		m.add(edge, getProp("effect"), n1);
-		m.add(edge, getProp("cause"), n2);			
+		m.add(edge, getProp("effect"), n2);			
 		return m;
 	}
 	/**
@@ -592,7 +646,7 @@ public class RDFProvider {
 	private static List<String> executeArraySparqlQuery(StringBuffer qry) throws RepositoryException, QueryEvaluationException, MalformedQueryException {
 		List<String> resource = new ArrayList<String>();		
 		String query = qry.toString();		
-			connect();	
+			//connect();	
 			TupleQuery output = getCon().prepareTupleQuery(QueryLanguage.SPARQL, query);
 			TupleQueryResult result = output.evaluate();		
 			while (result.hasNext()) 
@@ -602,7 +656,7 @@ public class RDFProvider {
 				   resource.add(value.stringValue());
 			}
 			result.close();
-			disconnect();	
+			//disconnect();	
 		return resource;
 	}
 	/**
@@ -616,7 +670,7 @@ public class RDFProvider {
 	private static String executeSparqlQuery(StringBuffer qry) throws RepositoryException, MalformedQueryException, QueryEvaluationException {
 		String resource = null;		
 		String query = qry.toString();		
-			connect();	
+			//connect();	
 			TupleQuery output = getCon().prepareTupleQuery(QueryLanguage.SPARQL, query);
 			TupleQueryResult result = output.evaluate();		
 			while (result.hasNext()) 
@@ -626,7 +680,7 @@ public class RDFProvider {
 				   resource = value.stringValue();
 			}
 			result.close();
-			disconnect();	
+			//disconnect();	
 		return resource;
 	}
 	
@@ -636,6 +690,8 @@ public class RDFProvider {
 	 */
 	public static void connect() throws RepositoryException
 	{
+		if(con != null)
+			return;
 		Repository rep = new HTTPRepository(Properties.getString("url"), Properties.getString("repository"));
 		rep.initialize();
 		setCon(rep.getConnection());

@@ -36,18 +36,18 @@ public class Graph {
 		return null;
 	}
 	public void addNode(Node n){
-		if(!nodes.contains(n))
+		if(!nodes.contains(n) && n != null)
 			nodes.add(n);
 	}
 	public void addEdge(Edge e){
 		if(e == null)
 			return;
 		Node from = e.getFrom();
-		Node to = e.getFrom();
+		Node to = e.getTo();
 		addNode(from);
 		addNode(to);
 		Node from2 = getNode(from.getId());
-		Node to2 = getNode(from.getId());
+		Node to2 = getNode(to.getId());
 		from2.addAdjacency(e);
 		to2.addAdjacency(e);
 	}
@@ -58,6 +58,12 @@ public class Graph {
 
 	public void setNodes(List<Node> nodes) {
 		this.nodes = nodes;
+		for(int i = 0; i<this.nodes.size();i++){
+			if(this.nodes.get(i) == null){
+				this.nodes.remove(i);
+				i--;
+			}
+		}
 	}
 	public int size(){
 		return nodes.size();
@@ -65,7 +71,7 @@ public class Graph {
 	public Node get(int i){
 		return nodes.get(i);
 	}
-	protected Graph merge(Graph g2){
+	public Graph merge(Graph g2){
 		Graph g = new Graph();
 		for(Node n:this.nodes){
 			g.addNode(n);
