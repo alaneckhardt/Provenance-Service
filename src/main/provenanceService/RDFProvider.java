@@ -191,7 +191,7 @@ public class RDFProvider {
 		OntClass c = ontologies.getOntClass(oclass);		
 		ExtendedIterator<OntClass> l = c.listSuperClasses();
 		List<Restriction> restr = new ArrayList<Restriction>();
-		System.out.println(oclass);
+		//System.out.println(oclass);
 		while(l.hasNext()){
 			OntClass sc = l.next();
 			//We take only restrictions

@@ -464,7 +464,7 @@ public class ProvenanceService  extends javax.servlet.http.HttpServlet implement
 	 * @param title Title.
 	 */
 	public static String addTitle(String sessionId, String object, String title){
-		System.out.println(sessionId+","+object+","+title);
+		//System.out.println(sessionId+","+object+","+title);
 		Model model = sessions.get(sessionId);
 		if(model == null)
 			return "Error - no session "+sessionId;
