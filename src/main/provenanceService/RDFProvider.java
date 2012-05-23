@@ -49,6 +49,7 @@ import com.hp.hpl.jena.vocabulary.RDF;
 public class RDFProvider {
 	private static RepositoryConnection con;
 	private static OntModel ontologies;
+
 	/**List of custom properties to load.*/
 	private static List<String> customProperties;
 	@SuppressWarnings("unchecked")
@@ -311,6 +312,9 @@ public class RDFProvider {
 		Statement t = res.getProperty(res.getModel().getProperty(Properties.getString("title")));
 		if(t != null)
 			node.setTitle(t.getString());
+		else
+			node.setTitle(Utility.getLocalName(res.getURI()));
+
 		t = res.getProperty(RDF.type);
 		if(t != null){
 			node.setType(t.getObject().toString());
@@ -333,6 +337,9 @@ public class RDFProvider {
 	 * @throws OpenRDFException
 	 */
 	public static Edge getEdge(Graph g, Resource edge) throws OpenRDFException {
+		if(edge.getProperty(getProp("cause")) == null || edge.getProperty(getProp("effect")) == null){
+			return null;
+		}
 		Edge e = new Edge(edge.getURI());
 		Statement t = edge.getProperty(RDF.type);
 		if(t != null)
@@ -722,5 +729,12 @@ public class RDFProvider {
 
 	public static void setCustomProperties(List<String> customProperties) {
 		RDFProvider.customProperties = customProperties;
+	}
+	public static OntModel getOntologies() {
+		return ontologies;
+	}
+
+	public static void setOntologies(OntModel ontologies) {
+		RDFProvider.ontologies = ontologies;
 	}
 }

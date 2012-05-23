@@ -153,6 +153,7 @@ public class ProvenanceService  extends javax.servlet.http.HttpServlet implement
 			getBasicTypes().put(subClasses.get(i),"Process");
 		}					
 	}
+
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException 
 	{		
 		initProvenance();
@@ -294,10 +295,11 @@ public class ProvenanceService  extends javax.servlet.http.HttpServlet implement
 		}
 		else if("getProvenance".equals(action)){
 			String resource = request.getParameter("resource");
+			String session = request.getParameter("session");
 			resource = URLDecoder.decode(resource, "UTF-8");
 			Graph g;
 			try {
-				g = getProvenance(resource);
+				g = getProvenance(resource, session);
 				output = graphToJSONString(g);		
 			} catch (OpenRDFException e) {
 				e.printStackTrace();
@@ -708,15 +710,15 @@ public class ProvenanceService  extends javax.servlet.http.HttpServlet implement
 	 * @throws MalformedQueryException 
 	 * @throws RepositoryException 
 	 */
-	public static Graph getProvenance(String resource) throws OpenRDFException{
-		Graph prov = getImmediateProvenance(resource);
+	public static Graph getProvenance(String resource, String sessionId) throws OpenRDFException{
+		Graph prov = getImmediateProvenance(resource, sessionId);
 		Graph provAll = prov;
 		for(Node n:prov.getNodes()){
 			//Load the provenance only of processes
 			try {
 				if(!"Process".equals(getShape(n.getType())))
 						continue;
-				Graph prov2 = getImmediateProvenance(n.getId());
+				Graph prov2 = getImmediateProvenance(n.getId(), sessionId);
 				provAll = provAll.merge(prov2);
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -732,63 +734,30 @@ public class ProvenanceService  extends javax.servlet.http.HttpServlet implement
 	 * @return Graph containing the given resource and all edges directing from it.
 	 * @throws OpenRDFException
 	 */
-	public static Graph getProvenanceFrom(String resourceID) throws OpenRDFException{		
+	public static Graph getProvenanceFrom(String resourceID, String sessionId) throws OpenRDFException{		
 		Graph g= new Graph();
-		Node n = RDFProvider.getNode(g, resourceID);
+		Graph g2 = new Graph();
+		if(sessions.containsKey(sessionId))
+			g2 = RDFProvider.getModelGraph(sessions.get(sessionId));
+		Node n = RDFProvider.getNode(g2, resourceID);
 		g.addNode(n);
-		RDFProvider.getAdjacencies(g, n, 1);
+		RDFProvider.getAdjacencies(g2, n, 1);
 		return g;
 	}
-	/*private static Node processOneLine(BindingSet bindingSet, Node res, boolean from){
-			String edge = bindingSet.getValue("edge").stringValue();
-		   String etype = bindingSet.getValue("etype").stringValue();
-		   String o = bindingSet.getValue("o").stringValue();
-		   String otype = bindingSet.getValue("otype").stringValue();
-		   String otitle = "";
-		   if(bindingSet.hasBinding("otitle"))
-			   otitle  = bindingSet.getValue("otitle").stringValue();
-		   
-		   if("Agent".equals(basicTypes.get(otype))){
-				String firstname = "", surname = "";
-				try {
-					firstname = rdf.getFoafPropertyFromFoafID(o, FOAF.firstName.toString());
-					surname = rdf.getFoafPropertyFromFoafID(o, FOAF.surname.toString());
-				} catch (Exception e1) {
-					e1.printStackTrace();
-				} 
-				String fullname = firstname + " " + surname;
-				otitle = fullname;
-			}
-		   Edge e = new Edge();	
-		   Node n = new Node(o);
-		   if(from){
-			   e.setFrom(res);
-			   e.setTo(n);			   
-		   }
-		   else{
-			   e.setFrom(n);	
-			   e.setTo(res);		   
-		   }
-		   e.setId(edge);
-		   e.setType(etype);
-		   n.setTitle(otitle);
-		   n.setType(otype);	
-		   n.addAdjacency(e);
-		   res.addAdjacency(e);
-		   return n;
-	}*/
 	/**
 	 * Gets the edges to the given resource.
 	 * @param resourceID
 	 * @return Graph containing the given resource and all edges directing to it.
 	 * @throws OpenRDFException
 	 */
-	public static Graph getProvenanceTo(String resourceID) throws OpenRDFException{		
+	public static Graph getProvenanceTo(String resourceID, String sessionId) throws OpenRDFException{		
 		Graph g = new Graph();
-
-		Node n = RDFProvider.getNode(g, resourceID);
+		Graph g2 = new Graph();
+		if(sessions.containsKey(sessionId))
+			g2 = RDFProvider.getModelGraph(sessions.get(sessionId));
+		Node n = RDFProvider.getNode(g2, resourceID);
 		g.addNode(n);
-		RDFProvider.getAdjacencies(g, n, 0);
+		RDFProvider.getAdjacencies(g2, n, 0);
 		return g;
 	}
 	
@@ -800,9 +769,9 @@ public class ProvenanceService  extends javax.servlet.http.HttpServlet implement
 	 * @throws MalformedQueryException 
 	 * @throws RepositoryException 
 	 */
-	public static Graph getImmediateProvenance(String resource) throws OpenRDFException {
-		Graph l = getProvenanceTo(resource);
-		l = l.merge(getProvenanceFrom(resource));
+	public static Graph getImmediateProvenance(String resource, String sessionId) throws OpenRDFException {
+		Graph l = getProvenanceTo(resource, sessionId);
+		l = l.merge(getProvenanceFrom(resource, sessionId));
 		for (int i = 0; i < l.size(); i++) {
 			Node n = l.get(i);
 			for(Edge e : n.getAdjacencies()){
@@ -843,6 +812,10 @@ public class ProvenanceService  extends javax.servlet.http.HttpServlet implement
 		ProvenanceService.basicTypes = basicTypes;
 	}
 
+	public static void setSessions(Map<String, Model> sessions) {
+		ProvenanceService.sessions = sessions;
+	}
+	
 	public static String getNamespace() {
 		return namespace;
 	}
