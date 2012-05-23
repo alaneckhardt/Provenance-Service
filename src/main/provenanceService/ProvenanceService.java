@@ -737,7 +737,7 @@ public class ProvenanceService  extends javax.servlet.http.HttpServlet implement
 	public static Graph getProvenanceFrom(String resourceID, String sessionId) throws OpenRDFException{		
 		Graph g= new Graph();
 		Graph g2 = new Graph();
-		if(sessions.containsKey(sessionId))
+		if(sessions.containsKey(sessionId) && sessions.get(sessionId) != null)
 			g2 = RDFProvider.getModelGraph(sessions.get(sessionId));
 		Node n = RDFProvider.getNode(g2, resourceID);
 		g.addNode(n);
@@ -753,7 +753,7 @@ public class ProvenanceService  extends javax.servlet.http.HttpServlet implement
 	public static Graph getProvenanceTo(String resourceID, String sessionId) throws OpenRDFException{		
 		Graph g = new Graph();
 		Graph g2 = new Graph();
-		if(sessions.containsKey(sessionId))
+		if(sessions.containsKey(sessionId) && sessions.get(sessionId) != null)
 			g2 = RDFProvider.getModelGraph(sessions.get(sessionId));
 		Node n = RDFProvider.getNode(g2, resourceID);
 		g.addNode(n);

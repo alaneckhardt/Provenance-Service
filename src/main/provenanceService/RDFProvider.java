@@ -312,8 +312,8 @@ public class RDFProvider {
 		Statement t = res.getProperty(res.getModel().getProperty(Properties.getString("title")));
 		if(t != null)
 			node.setTitle(t.getString());
-		else
-			node.setTitle(Utility.getLocalName(res.getURI()));
+		//else
+		//	node.setTitle(Utility.getLocalName(res.getURI()));
 
 		t = res.getProperty(RDF.type);
 		if(t != null){
@@ -406,6 +406,8 @@ public class RDFProvider {
 	 */
 	public static Model getNodeModel(Node n){
 		Model m = ModelFactory.createDefaultModel();
+		if(n == null)
+			return m;
 		Resource r = m.createResource(n.getId());
 		if(n.getType() != null)
 			m.add(r, RDF.type, m.createResource(n.getType()));
@@ -505,6 +507,8 @@ public class RDFProvider {
 	 */
 	public static Model getEdgeModel(Edge e){
 		Model m = ModelFactory.createDefaultModel();
+		if(e == null)
+			return m;
 		Resource edge = m.createResource(e.getId());
 		m.add(edge, RDF.type, m.createResource(e.getType()));
 		Resource n1 = m.createResource(e.getFrom().getId());
@@ -534,6 +538,8 @@ public class RDFProvider {
 	 */
 	public static Graph getModelGraph(Model m){
 		Graph g = new Graph();
+		if(m == null)
+			return g;
 		for(String nodeType : ProvenanceService.getNodes()){
 			ResIterator it = m.listResourcesWithProperty(RDF.type, m.getResource(nodeType));
 			while(it.hasNext()){
