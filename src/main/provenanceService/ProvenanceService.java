@@ -105,17 +105,10 @@ public class ProvenanceService  extends javax.servlet.http.HttpServlet implement
 		
 		namespace = Properties.getString("namespace");
 		sessions = new HashMap<String, Model>();
-		sessionsDelete = new HashMap<String, List<String>>();
-		getBasicTypes().put(Properties.getString("process"), "Process");
-		getBasicTypes().put(Properties.getString("agent"), "Agent");
-		getBasicTypes().put(Properties.getString("artifact"), "Artifact");
-		Vector<String> subClasses = RDFProvider.getSubclasses(Properties.getString("edge"));
-		properties.addAll(subClasses);
-		for(int i=0;i<properties.size();i++){
-			subClasses = RDFProvider.getSubclasses(  properties.get(i));
-			properties.addAll(subClasses);
-		}
 		
+		sessionsDelete = new HashMap<String, List<String>>();
+		initNodes();
+		initEdges();
 		//Can't use the easy way - we want to show the correct shapes and therefore know the superclass
 		/*subClasses = ont.getSubclassListFull("general",  "http://openprovenance.org/ontology#Node");
 		nodes.addAll(subClasses);
@@ -129,6 +122,24 @@ public class ProvenanceService  extends javax.servlet.http.HttpServlet implement
 		properties.add("http://openprovenance.org/ontology#WasGeneratedBy");
 		properties.add("http://openprovenance.org/ontology#WasDerivedFrom");
 		*/
+	}
+
+	public static void initEdges(){
+
+		properties = new ArrayList<String>();
+		Vector<String> subClasses = RDFProvider.getSubclasses(Properties.getString("edge"));
+		properties.addAll(subClasses);
+		for(int i=0;i<properties.size();i++){
+			subClasses = RDFProvider.getSubclasses(  properties.get(i));
+			properties.addAll(subClasses);
+		}
+	}
+	public static void initNodes(){
+		getBasicTypes().put(Properties.getString("process"), "Process");
+		getBasicTypes().put(Properties.getString("agent"), "Agent");
+		getBasicTypes().put(Properties.getString("artifact"), "Artifact");
+		Vector<String> subClasses;
+		nodes = new ArrayList<String>();
 		//Agents subclasses
 		nodes.add(Properties.getString("agent"));
 		subClasses = RDFProvider.getSubclasses(Properties.getString("agent"));
@@ -151,7 +162,7 @@ public class ProvenanceService  extends javax.servlet.http.HttpServlet implement
 		nodes.addAll(subClasses);
 		for(int i=0;i<subClasses.size();i++){
 			getBasicTypes().put(subClasses.get(i),"Process");
-		}					
+		}
 	}
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException 
