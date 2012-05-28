@@ -28,8 +28,8 @@ public class TestRDFProvider extends TestCase {
 	
 	public void testConnection() {
 		try {
-			RDFProvider.connect();
-			RDFProvider.disconnect();
+			AllTests.dataProvider.connect();
+			AllTests.dataProvider.disconnect();
 		} catch (Exception e) {
 			fail(e.getLocalizedMessage());
 		}
@@ -40,8 +40,8 @@ public class TestRDFProvider extends TestCase {
 			
 			Node n = AllTests.getTestNode(1, null);
 			AllTests.deleteTemporary( n.getId());			
-			RDFProvider.insertNode(n);
-			Node nControl = RDFProvider.getNode(null, n.getId());
+			AllTests.dataProvider.insertNode(n);
+			Node nControl = AllTests.dataProvider.getNode(null, n.getId());
 			assertTrue(nControl != null);
 			assertTrue(nControl.equals(n));
 		} catch (Exception e) {
@@ -58,14 +58,14 @@ public class TestRDFProvider extends TestCase {
 			AllTests.deleteTemporary( n2.getId());
 			AllTests.deleteTemporary( e.getId());
 			
-			RDFProvider.insertNode(n);
-			Node nControl = RDFProvider.getNode(null, n.getId());
+			AllTests.dataProvider.insertNode(n);
+			Node nControl = AllTests.dataProvider.getNode(null, n.getId());
 			assertTrue(nControl != null);
 			assertTrue(nControl.equals(n));
-			nControl = RDFProvider.getNode(null, n2.getId());
+			nControl = AllTests.dataProvider.getNode(null, n2.getId());
 			assertTrue(nControl != null);
 			assertTrue(nControl.equals(n2));
-			Edge nControlE = RDFProvider.getEdge(null, e.getId());
+			Edge nControlE = AllTests.dataProvider.getEdge(null, e.getId());
 			assertTrue(nControlE != null);
 			assertTrue(nControlE.equals(e));
 		} catch (Exception e) {
@@ -85,11 +85,11 @@ public class TestRDFProvider extends TestCase {
 			AllTests.deleteTemporary( n.getId());
 			AllTests.deleteTemporary( n2.getId());
 			AllTests.deleteTemporary( e.getId());
-			nControl = RDFProvider.getNode(null, "http://openprovenance.org/ontology#Resource1");
+			nControl = AllTests.dataProvider.getNode(null, "http://openprovenance.org/ontology#Resource1");
 			assertTrue(nControl == null || nControl.getType() == null);
-			nControl = RDFProvider.getNode(null, "http://openprovenance.org/ontology#Process1");
+			nControl = AllTests.dataProvider.getNode(null, "http://openprovenance.org/ontology#Process1");
 			assertTrue(nControl == null || nControl.getType() == null);
-			Edge nControlE = RDFProvider.getEdge(null, "http://openprovenance.org/ontology#Edge1");
+			Edge nControlE = AllTests.dataProvider.getEdge(null, "http://openprovenance.org/ontology#Edge1");
 			assertTrue(nControlE == null || nControlE.getType() == null);
 		} catch (org.openrdf.OpenRDFException e) {
 			e.printStackTrace();

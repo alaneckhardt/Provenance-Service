@@ -94,6 +94,7 @@ public class ProvenanceService  extends javax.servlet.http.HttpServlet implement
 	private static Map<String, String> basicTypes = new HashMap<String, String>();
 	private static List<String> properties = new ArrayList<String>();
 	private static List<String> nodes = new ArrayList<String>();
+	private static DataProvider dataProvider = new DataProvider();
 	public ProvenanceService(){
 	}
 
@@ -101,7 +102,9 @@ public class ProvenanceService  extends javax.servlet.http.HttpServlet implement
 		if(sessions != null)
 			return;
 		RDFProvider.init();
-		JSONProvider.init();
+		JSONProvider.init(); 
+		ProvenanceService.dataProvider = new DataProvider();
+		ProvenanceService.dataProvider.init();
 		
 		namespace = Properties.getString("namespace");
 		sessions = new HashMap<String, Model>();
@@ -127,14 +130,15 @@ public class ProvenanceService  extends javax.servlet.http.HttpServlet implement
 	public static void initEdges(){
 
 		properties = new ArrayList<String>();
-		Vector<String> subClasses = RDFProvider.getSubclasses(Properties.getString("edge"));
+		Vector<String> subClasses = dataProvider.getSubclasses(Properties.getString("edge"));
 		properties.addAll(subClasses);
 		for(int i=0;i<properties.size();i++){
-			subClasses = RDFProvider.getSubclasses(  properties.get(i));
+			subClasses = dataProvider.getSubclasses(  properties.get(i));
 			properties.addAll(subClasses);
 		}
 	}
 	public static void initNodes(){
+		getBasicTypes().clear();
 		getBasicTypes().put(Properties.getString("process"), "Process");
 		getBasicTypes().put(Properties.getString("agent"), "Agent");
 		getBasicTypes().put(Properties.getString("artifact"), "Artifact");
@@ -142,7 +146,7 @@ public class ProvenanceService  extends javax.servlet.http.HttpServlet implement
 		nodes = new ArrayList<String>();
 		//Agents subclasses
 		nodes.add(Properties.getString("agent"));
-		subClasses = RDFProvider.getSubclasses(Properties.getString("agent"));
+		subClasses = dataProvider.getSubclasses(Properties.getString("agent"));
 		nodes.addAll(subClasses);
 		for(int i=0;i<subClasses.size();i++){
 			getBasicTypes().put(subClasses.get(i),"Agent");
@@ -150,7 +154,7 @@ public class ProvenanceService  extends javax.servlet.http.HttpServlet implement
 
 		//Artifacts subclasses
 		nodes.add(Properties.getString("artifact"));
-		subClasses = RDFProvider.getSubclasses(Properties.getString("artifact"));
+		subClasses = dataProvider.getSubclasses(Properties.getString("artifact"));
 		nodes.addAll(subClasses);
 		for(int i=0;i<subClasses.size();i++){
 			getBasicTypes().put(subClasses.get(i),"Artifact");
@@ -158,7 +162,7 @@ public class ProvenanceService  extends javax.servlet.http.HttpServlet implement
 
 		//Processes subclasses
 		nodes.add(Properties.getString("process"));
-		subClasses = RDFProvider.getSubclasses( Properties.getString("process"));
+		subClasses = dataProvider.getSubclasses( Properties.getString("process"));
 		nodes.addAll(subClasses);
 		for(int i=0;i<subClasses.size();i++){
 			getBasicTypes().put(subClasses.get(i),"Process");
@@ -322,7 +326,7 @@ public class ProvenanceService  extends javax.servlet.http.HttpServlet implement
 			resource = URLDecoder.decode(resource, "UTF-8");
 			Node n = null;
 			try {
-				n = RDFProvider.getNode(null, resource);
+				n = dataProvider.getNode(null, resource);
 				Graph g = new Graph();
 				g.addNode(n);
 				output = graphToJSONString(g);	
@@ -533,11 +537,19 @@ public class ProvenanceService  extends javax.servlet.http.HttpServlet implement
 		Resource e = model.getResource(effect);
 		Resource r = model.getResource(type);
 		model.add(relationship, RDF.type, r);
-		model.add(relationship, RDFProvider.getProp("cause"), c);
-		model.add(relationship, RDFProvider.getProp("effect"), e);
+		model.add(relationship, Utility.getProp("cause"), c);
+		model.add(relationship, Utility.getProp("effect"), e);
 		return relationship.getURI();
 	}
 	
+	public static DataProvider getDataProvider() {
+		return dataProvider;
+	}
+
+	public static void setDataProvider(DataProvider dataProvider) {
+		ProvenanceService.dataProvider = dataProvider;
+	}
+
 	/**
 	 * Adds an existing resource from the RDF store to the session graph.
 	 * @param sessionId
@@ -547,7 +559,7 @@ public class ProvenanceService  extends javax.servlet.http.HttpServlet implement
 	public static String addExistingResource(String sessionId, String uri){	
 		Node n;
 		try {
-			n = RDFProvider.getNode(null, uri);
+			n = dataProvider.getNode(null, uri);
 			return addExistingResource(sessionId, uri, n.getType(), n.getTitle());
 		} catch (org.openrdf.OpenRDFException e) {
 			e.printStackTrace();
@@ -687,9 +699,9 @@ public class ProvenanceService  extends javax.servlet.http.HttpServlet implement
 		if(m == null)
 			return "Error - no session "+sessionId;
 		try {
-			RDFProvider.write(m);
+			dataProvider.write(m);
 			if(sessionsDelete.get(sessionId) != null){
-				RDFProvider.delete(sessionsDelete.get(sessionId));
+				dataProvider.delete(sessionsDelete.get(sessionId));
 			}
 		} catch (OpenRDFException e) {
 			e.printStackTrace();
@@ -750,9 +762,9 @@ public class ProvenanceService  extends javax.servlet.http.HttpServlet implement
 		Graph g2 = new Graph();
 		if(sessions.containsKey(sessionId) && sessions.get(sessionId) != null)
 			g2 = RDFProvider.getModelGraph(sessions.get(sessionId));
-		Node n = RDFProvider.getNode(g2, resourceID);
+		Node n = dataProvider.getNode(g2, resourceID);
 		g.addNode(n);
-		RDFProvider.getAdjacencies(g2, n, 1);
+		dataProvider.getAdjacencies(g2, n, 1);
 		return g;
 	}
 	/**
@@ -766,9 +778,9 @@ public class ProvenanceService  extends javax.servlet.http.HttpServlet implement
 		Graph g2 = new Graph();
 		if(sessions.containsKey(sessionId) && sessions.get(sessionId) != null)
 			g2 = RDFProvider.getModelGraph(sessions.get(sessionId));
-		Node n = RDFProvider.getNode(g2, resourceID);
+		Node n = dataProvider.getNode(g2, resourceID);
 		g.addNode(n);
-		RDFProvider.getAdjacencies(g2, n, 0);
+		dataProvider.getAdjacencies(g2, n, 0);
 		return g;
 	}
 	

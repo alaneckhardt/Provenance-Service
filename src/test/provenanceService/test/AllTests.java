@@ -3,10 +3,12 @@ package provenanceService.test;
 import org.openrdf.query.GraphQuery;
 import org.openrdf.query.GraphQueryResult;
 import org.openrdf.query.QueryLanguage;
+import org.openrdf.repository.RepositoryException;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
+import provenanceService.DataProvider;
 import provenanceService.Edge;
 import provenanceService.Graph;
 import provenanceService.JSONProvider;
@@ -18,13 +20,14 @@ import provenanceService.Utility;
 
 
 public class AllTests extends TestCase {   
+	static DataProvider dataProvider = new DataProvider();
 	public AllTests (String testName) {
 		super (testName);
 	}
 	public AllTests(){
 	}
 	public static Test suite() {
-		Properties.setBaseFolder("./");
+		Properties.setBaseFolder("Webcontent/");
 		Properties.setFile("test.properties");
 		RDFProvider.init();
 		JSONProvider.init();
@@ -43,7 +46,14 @@ public class AllTests extends TestCase {
 			n.setBasicType(ProvenanceService.getShape(type));
 		}
 		int j = 0;
-		for(String prop : RDFProvider.getCustomProperties()){
+		dataProvider.init();
+		try {
+			dataProvider.connect();
+		} catch (RepositoryException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		for(String prop : dataProvider.getCustomProperties()){
 			n.addProperty(prop, "TestProp"+i*10+j);
 			j++;
 		}
@@ -76,13 +86,13 @@ public class AllTests extends TestCase {
 				qry.append("<"+subject+"> ?p ?o. } where { ");
 				qry.append("<"+subject+"> ?p ?o. } ");
 				String query = qry.toString();
-				
-				RDFProvider.connect();
-				GraphQuery q = RDFProvider.getCon().prepareGraphQuery(QueryLanguage.SPARQL, query);				
+				dataProvider.init();
+				dataProvider.connect();
+				GraphQuery q = dataProvider.getCon().prepareGraphQuery(QueryLanguage.SPARQL, query);				
 				GraphQueryResult result = q.evaluate();
-				RDFProvider.getCon().remove(result);
-				RDFProvider.getCon().commit();
-				RDFProvider.disconnect();
+				dataProvider.getCon().remove(result);
+				dataProvider.getCon().commit();
+				dataProvider.disconnect();
 			} catch (Exception e) {
 			fail(e.getLocalizedMessage());			
 		}

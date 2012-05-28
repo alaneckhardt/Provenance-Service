@@ -43,10 +43,10 @@ public class TestProvenanceService extends TestCase {
 		for (int i = 0; i < g.size(); i++) {
 			try {
 				Node n = g.get(i);
-				Node n2 = RDFProvider.getNode(null, n.getId());
+				Node n2 = AllTests.dataProvider.getNode(null, n.getId());
 				assertTrue(n.equals(n2));
 				for(Edge e : n.getAdjacencies()){
-					Edge e2 = RDFProvider.getEdge(null, e.getId());
+					Edge e2 = AllTests.dataProvider.getEdge(null, e.getId());
 					assertTrue(e.equals(e2));					
 				}
 			} catch (org.openrdf.OpenRDFException e) {
@@ -169,12 +169,12 @@ public class TestProvenanceService extends TestCase {
 			try {
 				Node n = g.get(i);
 				AllTests.deleteTemporary( n.getId());
-				Node nControl = RDFProvider.getNode(null, n.getId());
+				Node nControl = AllTests.dataProvider.getNode(null, n.getId());
 				assertTrue(nControl == null || nControl.getType() == null);
 				
 				for(Edge e : n.getAdjacencies()){
 					AllTests.deleteTemporary( e.getId());
-					Edge eControl = RDFProvider.getEdge(null, e.getId());
+					Edge eControl = AllTests.dataProvider.getEdge(null, e.getId());
 					assertTrue(eControl == null);
 				}
 			} catch (Exception e) {
