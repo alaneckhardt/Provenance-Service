@@ -294,7 +294,7 @@ public class ProvenanceService  extends javax.servlet.http.HttpServlet implement
 			String session = request.getParameter("session");
 			session = URLDecoder.decode(session, "UTF-8");
 			rollback(session);
-			output = "";	
+			output = "ok";	
 		}			
 		else if("getGraph".equals(action)){
 			String session = request.getParameter("session");
