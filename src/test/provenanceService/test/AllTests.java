@@ -27,7 +27,7 @@ public class AllTests extends TestCase {
 	public AllTests(){
 	}
 	public static Test suite() {
-		Properties.setBaseFolder("Webcontent/");
+		Properties.setBaseFolder("./");
 		Properties.setFile("test.properties");
 		RDFProvider.init();
 		JSONProvider.init();
