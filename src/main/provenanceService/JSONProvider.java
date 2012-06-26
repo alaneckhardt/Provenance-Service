@@ -154,6 +154,15 @@ public class JSONProvider {
 		edge.put("from", e.getFrom().getId());
 		edge.put("type", e.getType());
 		edge.put("typeText", Utility.getLocalName(e.getType()));
+		JSONArray properties = new JSONArray();
+		for (String name : e.getProperties().keySet()) {
+			Object value = e.getProperty(name);
+			JSONObject prop = new JSONObject();
+			prop.put("name", name);
+			prop.put("value", value);
+			properties.add(prop);
+		}
+		edge.put("properties", properties);
 		return edge;
 	}
 	/**
