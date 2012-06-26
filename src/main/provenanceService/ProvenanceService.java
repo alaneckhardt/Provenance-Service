@@ -238,15 +238,15 @@ public class ProvenanceService  extends javax.servlet.http.HttpServlet implement
 			output = addNode(session, type);					
 		}
 		else if("addCausalRelationship".equals(action)){
-			String cause = request.getParameter("cause");
-			String effect = request.getParameter("effect");
+			String from = request.getParameter("from");
+			String to = request.getParameter("to");
 			String relation = request.getParameter("relation");
 			String session = request.getParameter("session");
-			cause = URLDecoder.decode(cause, "UTF-8");
-			effect = URLDecoder.decode(effect, "UTF-8");
+			from = URLDecoder.decode(from, "UTF-8");
+			to = URLDecoder.decode(to, "UTF-8");
 			relation = URLDecoder.decode(relation, "UTF-8");
 			session = URLDecoder.decode(session, "UTF-8");
-			output = addCausalRelationship(session, relation,  cause, effect);			
+			output = addCausalRelationship(session, relation,  from, to);			
 		}
 		else if("addTitle".equals(action)){
 			String title = request.getParameter("title");
@@ -522,23 +522,23 @@ public class ProvenanceService  extends javax.servlet.http.HttpServlet implement
 	 * Adds relationship to the process. Causal relationships are e.g. controlledBy, Used, wasGeneratedBy,...
 	 * @param sessionId URI of the process to be the relation added to.
 	 * @param type The type of the causal relationship.
-	 * @param cause The subject of the relationship - this can be artifact, agent, or other process.
-	 * @param effect The object of the relationship - this can be artifact, agent, or other process.
+	 * @param from The subject of the relationship - this can be artifact, agent, or other process.
+	 * @param to The object of the relationship - this can be artifact, agent, or other process.
 	 * @return
 	 */
-	public static String addCausalRelationship(String sessionId,String type, String cause,  String effect){		
+	public static String addCausalRelationship(String sessionId,String type, String from,  String to){		
 		Model model = sessions.get(sessionId);
 		String relationId = namespace + UUID.randomUUID().toString();
 
 		if(model == null)
 			return "Error - no session "+sessionId;
 		Resource relationship = model.createResource(relationId);
-		Resource c = model.getResource(cause);
-		Resource e = model.getResource(effect);
+		Resource c = model.getResource(from);
+		Resource e = model.getResource(to);
 		Resource r = model.getResource(type);
 		model.add(relationship, RDF.type, r);
-		model.add(relationship, Utility.getProp("cause"), c);
-		model.add(relationship, Utility.getProp("effect"), e);
+		model.add(relationship, Utility.getProp("from"), c);
+		model.add(relationship, Utility.getProp("to"), e);
 		return relationship.getURI();
 	}
 	

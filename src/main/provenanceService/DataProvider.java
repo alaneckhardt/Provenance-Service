@@ -26,17 +26,13 @@ import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.http.HTTPRepository;
 import org.openrdf.rio.RDFFormat;
 
-import com.hp.hpl.jena.iri.IRI;
-import com.hp.hpl.jena.iri.IRIFactory;
 import com.hp.hpl.jena.ontology.OntClass;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.Restriction;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.ResIterator;
 import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.util.iterator.ExtendedIterator;
@@ -225,12 +221,12 @@ public class DataProvider {
 		try {
 			List<String> adjacencies = null;
 			if(to==0)
-				adjacencies = getPropertiesTo(n.getId(), Properties.getString("cause"));
+				adjacencies = getPropertiesTo(n.getId(), Properties.getString("from"));
 			else if(to==1)
-				adjacencies = getPropertiesTo(n.getId(), Properties.getString("effect"));
+				adjacencies = getPropertiesTo(n.getId(), Properties.getString("to"));
 			else if(to==2){
-				adjacencies = getPropertiesTo(n.getId(), Properties.getString("cause"));
-				adjacencies.addAll(getPropertiesTo(n.getId(), Properties.getString("effect")));
+				adjacencies = getPropertiesTo(n.getId(), Properties.getString("from"));
+				adjacencies.addAll(getPropertiesTo(n.getId(), Properties.getString("to")));
 			}
 			else
 				return;
@@ -315,7 +311,7 @@ public class DataProvider {
 		if ((edge.getType() == null || edge.getType().equals("")))
 			return null;
 		
-		String from = getProperty(edgeURI, Properties.getString("cause"));
+		String from = getProperty(edgeURI, Properties.getString("from"));
 		if(from == null || !Utility.isURI(from))
 			return null;
 		if (g != null)
@@ -326,7 +322,7 @@ public class DataProvider {
 		if(edge.getFrom() == null)
 			return null;
 
-		String to = getProperty(edgeURI, Properties.getString("effect"));
+		String to = getProperty(edgeURI, Properties.getString("to"));
 		if(to == null || !Utility.isURI(to))
 			return null;
 		if (g != null)
@@ -389,7 +385,7 @@ public class DataProvider {
 			return null;	
 		if(!Utility.isURI(edge.getURI()))
 			return null;
-		if(edge.getProperty(Utility.getProp("cause")) == null || edge.getProperty(Utility.getProp("effect")) == null){
+		if(edge.getProperty(Utility.getProp("from")) == null || edge.getProperty(Utility.getProp("to")) == null){
 			return null;
 		}
 		Edge e = new Edge(edge.getURI());
@@ -398,7 +394,7 @@ public class DataProvider {
 			e.setType(t.getObject().toString());
 		
 
-		Resource tmp = edge.getProperty(Utility.getProp("cause")).getResource();
+		Resource tmp = edge.getProperty(Utility.getProp("from")).getResource();
 		if(tmp == null || !Utility.isURI(tmp.getURI()))
 			return null;
 		if (g != null)
@@ -409,7 +405,7 @@ public class DataProvider {
 		if(e.getFrom() == null)
 			return null;
 
-		tmp = edge.getProperty(Utility.getProp("effect")).getResource();
+		tmp = edge.getProperty(Utility.getProp("to")).getResource();
 		if(tmp == null || !Utility.isURI(tmp.getURI()))
 			return null;
 		if (g != null)
@@ -489,10 +485,10 @@ public class DataProvider {
 		Resource edge = m.createResource(e.getId());
 		m.add(edge, RDF.type, m.createResource(e.getType()));
 		Resource n1 = m.createResource(e.getFrom().getId());
-		m.add(edge, Utility.getProp("cause"), n1);
+		m.add(edge, Utility.getProp("from"), n1);
 		
 		Resource n2 = m.createResource(e.getTo().getId());
-		m.add(edge, Utility.getProp("effect"), n2);			
+		m.add(edge, Utility.getProp("to"), n2);			
 		return m;
 	}
 	/**

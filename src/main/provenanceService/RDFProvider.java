@@ -142,7 +142,7 @@ public class RDFProvider {
 			return null;	
 		if(!Utility.isURI(edge.getURI()))
 			return null;
-		if(edge.getProperty(Utility.getProp("cause")) == null || edge.getProperty(Utility.getProp("effect")) == null){
+		if(edge.getProperty(Utility.getProp("from")) == null || edge.getProperty(Utility.getProp("to")) == null){
 			return null;
 		}
 		Edge e = new Edge(edge.getURI());
@@ -151,15 +151,15 @@ public class RDFProvider {
 			e.setType(t.getObject().toString());
 		
 		if (g != null)
-			e.setFrom(g.getNode(edge.getProperty(Utility.getProp("cause")).getResource().getURI()));
+			e.setFrom(g.getNode(edge.getProperty(Utility.getProp("from")).getResource().getURI()));
 		if (e.getFrom() == null) {
-			e.setFrom(getNode(g, edge.getProperty(Utility.getProp("cause")).getResource()));
+			e.setFrom(getNode(g, edge.getProperty(Utility.getProp("from")).getResource()));
 		}
 		
 		if (g != null)
-			e.setTo(g.getNode(edge.getProperty(Utility.getProp("effect")).getResource().getURI()));
+			e.setTo(g.getNode(edge.getProperty(Utility.getProp("to")).getResource().getURI()));
 		if (e.getTo() == null) {
-			e.setTo(getNode(g, edge.getProperty(Utility.getProp("effect")).getResource()));
+			e.setTo(getNode(g, edge.getProperty(Utility.getProp("to")).getResource()));
 		}
 		
 		//Add the edge only if everything's all right
@@ -213,13 +213,13 @@ public class RDFProvider {
 				m.add(n1, RDF.type, m.createResource(e.getFrom().getType()));			
 			if(e.getFrom().getTitle() != null)
 				m.add(n1, Utility.getProp("title"), e.getFrom().getTitle());
-			m.add(edge, Utility.getProp("cause"), n1);
+			m.add(edge, Utility.getProp("from"), n1);
 			
 			if(e.getTo().getType() != null)
 				m.add(n2, RDF.type, m.createResource(e.getTo().getType()));
 			if(e.getTo().getTitle() != null)
 				m.add(n2, Utility.getProp("title"), e.getTo().getTitle());			
-			m.add(edge, Utility.getProp("effect"), n2);					
+			m.add(edge, Utility.getProp("to"), n2);					
 		}
 		return m;
 	}
@@ -237,10 +237,10 @@ public class RDFProvider {
 		Resource edge = m.createResource(e.getId());
 		m.add(edge, RDF.type, m.createResource(e.getType()));
 		Resource n1 = m.createResource(e.getFrom().getId());
-		m.add(edge, Utility.getProp("cause"), n1);
+		m.add(edge, Utility.getProp("from"), n1);
 		
 		Resource n2 = m.createResource(e.getTo().getId());
-		m.add(edge, Utility.getProp("effect"), n2);			
+		m.add(edge, Utility.getProp("to"), n2);			
 		return m;
 	}
 	/**

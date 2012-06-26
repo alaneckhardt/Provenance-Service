@@ -320,23 +320,23 @@ public class ProvenanceServiceImpl {
 	 * Adds relationship to the process. Causal relationships are e.g. controlledBy, Used, wasGeneratedBy,...
 	 * @param sessionId URI of the process to be the relation added to.
 	 * @param type The type of the causal relationship.
-	 * @param cause The subject of the relationship - this can be artifact, agent, or other process.
-	 * @param effect The object of the relationship - this can be artifact, agent, or other process.
+	 * @param from The subject of the relationship - this can be artifact, agent, or other process.
+	 * @param to The object of the relationship - this can be artifact, agent, or other process.
 	 * @return
 	 */
-	public  String addCausalRelationship(String sessionId,String type, String cause,  String effect){		
+	public  String addCausalRelationship(String sessionId,String type, String from,  String to){		
 		Model model = sessions.get(sessionId);
 		String relationId = namespace + UUID.randomUUID().toString();
 
 		if(model == null)
 			return "Error - no session "+sessionId;
 		Resource relationship = model.createResource(relationId);
-		Resource c = model.getResource(cause);
-		Resource e = model.getResource(effect);
+		Resource c = model.getResource(from);
+		Resource e = model.getResource(to);
 		Resource r = model.getResource(type);
 		model.add(relationship, RDF.type, r);
-		model.add(relationship, Utility.getProp("cause"), c);
-		model.add(relationship, Utility.getProp("effect"), e);
+		model.add(relationship, Utility.getProp("from"), c);
+		model.add(relationship, Utility.getProp("to"), e);
 		return relationship.getURI();
 	}
 	
