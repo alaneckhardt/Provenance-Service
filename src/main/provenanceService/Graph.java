@@ -7,39 +7,64 @@ import java.util.List;
  * @author AE
  *
  */
-public class Graph {	
-	List<Node> nodes = new ArrayList<Node>();
+public class Graph {
+	/**List of the Nodes in the graph.*/
+	private List<Node> nodes = new ArrayList<Node>();
 
+	/**
+	 * Empty constructor.
+	 */
 	public Graph(){
-		
 	}
-	
-	public boolean contains(String id){
+	/**
+	 * Returns true if the graph contains a node with given URI.
+	 * @param id URI of the node to search for.
+	 * @return true if the graph contains a node with given URI.
+	 */
+	public boolean contains(final String id){
 		for(Node n : nodes){
 			if(n.getId().equals(id))
 				return true;
 		}
 		return false;
 	}
-	public boolean contains(Node n){
+	/**
+	 * Returns true if the graph contains the given node.
+	 * @param n Node to search for.
+	 * @return true if the graph contains the node.
+	 */
+	public boolean contains(final Node n){
 		for(Node n2 : nodes){
 			if(n2.equals(n))
 				return true;
 		}
 		return false;
 	}
-	public Node getNode(String id){
+	/**
+	 * Returns the node with given URI.
+	 * @param id URI of the node to search for.
+	 * @return the node with given URI.
+	 */
+	public Node getNode(final String id){
 		for(Node n : nodes){
 			if(n.getId().equals(id))
 				return n;
 		}
 		return null;
 	}
-	public void addNode(Node n){
+	/**
+	 * Adds node to the graph.
+	 * @param n Node to add.
+	 */
+	public void addNode(final Node n){
 		if(!nodes.contains(n) && n != null)
 			nodes.add(n);
 	}
-	public void addEdge(Edge e){
+	/**
+	 * Add edge to the graph.
+	 * @param e Edge to add.
+	 */
+	public void addEdge(final Edge e){
 		if(e == null)
 			return;
 		Node from = e.getFrom();
@@ -51,12 +76,17 @@ public class Graph {
 		from2.addAdjacency(e);
 		to2.addAdjacency(e);
 	}
-	
+	/**
+	 * @return all nodes in the graph.
+	 */
 	public List<Node> getNodes() {
 		return nodes;
 	}
-
-	public void setNodes(List<Node> nodes) {
+	/**
+	 * Sets the nodes of the graph, replacing existing ones.
+	 * @param nodes Node to be used as the graph.
+	 */
+	public void setNodes(final List<Node> nodes) {
 		this.nodes = nodes;
 		for(int i = 0; i<this.nodes.size();i++){
 			if(this.nodes.get(i) == null){
@@ -65,13 +95,27 @@ public class Graph {
 			}
 		}
 	}
-	public int size(){
+
+	/**
+	 * @return Number of nodes.
+	 */
+	public int size() {
 		return nodes.size();
 	}
-	public Node get(int i){
+
+	/**
+	 * @param i Index of the node to return.
+	 * @return i-th node in the list.
+	 */
+	public Node get(final int i){
 		return nodes.get(i);
 	}
-	public Graph merge(Graph g2){
+	/**
+	 * Merges two graphs.
+	 * @param g2 A graph to be added to the current one.
+	 * @return A new graph containing nodes and edges from both graphs.
+	 */
+	public Graph merge(final Graph g2){
 		Graph g = new Graph();
 		for(Node n:this.nodes){
 			g.addNode(n);
@@ -97,9 +141,8 @@ public class Graph {
 					if(!foundEdge)
 						n3.getAdjacencies().add(e);
 				}
-				
 			}
-		}		
+		}
 		return g;
 	}
 }

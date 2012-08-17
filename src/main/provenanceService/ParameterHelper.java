@@ -11,7 +11,7 @@ import javax.servlet.http.HttpSession;
 public class ParameterHelper {
 	HttpServletRequest req;
 	HttpSession sess;
-	public ParameterHelper(HttpServletRequest req, HttpSession sess){
+	public ParameterHelper(final HttpServletRequest req, final HttpSession sess){
 		this.req = req;
 		this.sess = sess;
 	}
@@ -19,10 +19,10 @@ public class ParameterHelper {
 	 * Return the value of parameter in request or attribute in session. Request has priority.
 	 * If neither is defined, return the default value.
 	 * @param name
-	 * @param defaultValue
+	 * @param defaultValue Value that is used if request value is null
 	 * @return
 	 */
-	public Object getParameter(String name, Object defaultValue){
+	public Object getParameter(final String name, final Object defaultValue){
 		Object par = req.getParameter(name);		
 		if(par != null && !"null".equals(par)){
 			return par;
@@ -42,10 +42,10 @@ public class ParameterHelper {
 	 * Return the value of attribute in session. 
 	 * If it is not defined, return the default value.
 	 * @param name
-	 * @param defaultValue
+	 * @param defaultValue Value that is used if session value is null
 	 * @return
 	 */
-	public Object getSessionParameter(String name, Object defaultValue){
+	public Object getSessionParameter(final String name, final Object defaultValue){
 		Object par = sess.getAttribute(name);		
 		if(par != null && !"null".equals(par)){
 			return par;
@@ -53,7 +53,7 @@ public class ParameterHelper {
 		return defaultValue;
 	}
 	
-	public void setSessionParameter(String name, Object value){
+	public void setSessionParameter(final String name, final Object value){
 		sess.setAttribute(name, value);	
 	}
 
@@ -61,10 +61,10 @@ public class ParameterHelper {
 	 * Return the value of parameter in request. 
 	 * If it is not defined, return the default value.
 	 * @param name
-	 * @param defaultValue
+	 * @param defaultValue Value that is used if request value is null
 	 * @return
 	 */
-	public Object getRequestParameter(String name, Object defaultValue){
+	public Object getRequestParameter(final String name, final Object defaultValue){
 		Object par = req.getParameter(name);		
 		if(par != null && !"null".equals(par)){
 			return par;
@@ -76,7 +76,7 @@ public class ParameterHelper {
 		return defaultValue;
 	}
 	
-	public void setRequestParameter(String name, Object value){
+	public void setRequestParameter(final String name, final Object value){
 		req.setAttribute(name, value);	
 	}
 	
@@ -86,7 +86,7 @@ public class ParameterHelper {
 	}
 
 
-	public void setReq(HttpServletRequest req) {
+	public void setReq(final HttpServletRequest req) {
 		this.req = req;
 	}
 
@@ -96,7 +96,7 @@ public class ParameterHelper {
 	}
 
 
-	public void setSess(HttpSession sess) {
+	public void setSess(final HttpSession sess) {
 		this.sess = sess;
 	}
 	
