@@ -116,7 +116,7 @@ public class ProvenanceServiceImpl {
 		RDFProvider.init();
 		JSONProvider.init();
 		this.dataProvider = new DataProvider();
-		this.dataProvider.init();
+		this.dataProvider.init(this);
 
 		namespace = Properties.getString("namespace");
 		sessions = new HashMap<String, Model>();

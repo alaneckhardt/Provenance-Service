@@ -53,13 +53,16 @@ public class DataProvider {
 
 	/** List of custom properties to load. */
 	private List<String> customProperties;
-
+	
+	private ProvenanceServiceImpl impl;
 	/**
 	 * Initialises the connection to repository, loads  the ontologies.
 	 */
 	@SuppressWarnings("unchecked")
-	public void init() {
-
+	public void init(ProvenanceServiceImpl impl) {
+		this.impl = impl;
+		if(this.impl == null)
+			this.impl = ProvenanceService.getSingleton();
 		System.setProperty("http.proxyHost", Properties.getString("proxyhost"));
 		System.setProperty("http.proxyPort", Properties.getString("proxyport"));
 		try {
@@ -257,8 +260,8 @@ public class DataProvider {
 			throws RepositoryException, MalformedQueryException,
 			QueryEvaluationException {
 		// For persons, we have to get the name instead of the title.
-		if (ProvenanceService.getBasicTypes() != null
-				&& "Agent".equals(ProvenanceService.getShape(getProperty(
+		if (impl.getBasicTypes() != null
+				&& "Agent".equals(impl.getShape(getProperty(
 						resource, Properties.getString("type"))))) {
 			String firstname = getProperty(resource,
 					Properties.getString("firstname"));
@@ -353,7 +356,7 @@ public class DataProvider {
 		node = new Node(resource);
 		node.setType(getProperty(resource, Properties.getString("type")));
 		node.setTitle(getEntityDescription(resource));
-		node.setBasicType(ProvenanceService.getShape(node.getType()));
+		node.setBasicType(impl.getShape(node.getType()));
 		node.setAdjacencies(new ArrayList<Edge>());
 		loadCustomProperties(node, null);
 		// if(node.getType() == null || node.getType().equals(""))
@@ -436,7 +439,7 @@ public class DataProvider {
 		t = res.getProperty(RDF.type);
 		if (t != null) {
 			node.setType(t.getObject().toString());
-			node.setBasicType(ProvenanceService.getShape(node.getType()));
+			node.setBasicType(impl.getShape(node.getType()));
 		}
 		try {
 			loadCustomProperties(node, res);
@@ -504,7 +507,7 @@ public class DataProvider {
 
 	public Graph getAllProvenance() {
 		List<String> individuals = new ArrayList<String>();
-		for (String c : ProvenanceService.getNodes()) {
+		for (String c : impl.getNodes()) {
 			try {
 				individuals.addAll(getPropertiesTo(c,
 						"http://www.w3.org/1999/02/22-rdf-syntax-ns#type"));
@@ -517,7 +520,7 @@ public class DataProvider {
 			}
 		}
 		List<String> edges = new ArrayList<String>();
-		for (String c : ProvenanceService.getProperties()) {
+		for (String c : impl.getProperties()) {
 			try {
 				edges.addAll(getPropertiesTo(c,
 						"http://www.w3.org/1999/02/22-rdf-syntax-ns#type"));
@@ -596,7 +599,7 @@ public class DataProvider {
 		Graph g = new Graph();
 		if (m == null)
 			return g;
-		for (String nodeType : ProvenanceService.getNodes()) {
+		for (String nodeType : impl.getNodes()) {
 			ResIterator it = m.listResourcesWithProperty(RDF.type,
 					m.getResource(nodeType));
 			while (it.hasNext()) {
@@ -604,7 +607,7 @@ public class DataProvider {
 				g.addNode(RDFProvider.getNode(g, r));
 			}
 		}
-		for (String edgeType : ProvenanceService.getProperties()) {
+		for (String edgeType : impl.getProperties()) {
 			ResIterator it = m.listResourcesWithProperty(RDF.type,
 					m.getResource(edgeType));
 			while (it.hasNext()) {

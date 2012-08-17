@@ -14,6 +14,7 @@ import provenanceService.JSONProvider;
 import provenanceService.Node;
 import provenanceService.Properties;
 import provenanceService.ProvenanceService;
+import provenanceService.ProvenanceServiceImpl;
 import provenanceService.RDFProvider;
 
 import com.hp.hpl.jena.rdf.model.Model;
@@ -21,12 +22,14 @@ import com.hp.hpl.jena.rdf.model.Resource;
 
 
 public class TestProvenanceService extends TestCase {   
+	ProvenanceServiceImpl impl;
 	public TestProvenanceService (String testName) {
 		super (testName);
 		Properties.setFile("test.properties");
 	}
 	public TestProvenanceService(){
 		Properties.setFile("test.properties");
+		impl = ProvenanceService.getSingleton();
 	}
 	public static Test suite() {
 		TestSuite suite = new TestSuite();
@@ -120,9 +123,9 @@ public class TestProvenanceService extends TestCase {
 	}
 	public void testInsertSmallGraph() {
 		try {
-			String session = ProvenanceService.startSession();
-			ProvenanceService.addJSONGraph(session, JSONProvider.getGraphJSON(g).toString());
-			ProvenanceService.commit(session);
+			String session = impl.startSession();
+			impl.addJSONGraph(session, JSONProvider.getGraphJSON(g).toString());
+			impl.commit(session);
 			checkGraph(g);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -131,29 +134,29 @@ public class TestProvenanceService extends TestCase {
 	}
 
 	public void testConvertSmallGraph() {
-		String session = ProvenanceService.startSession();
+		String session = impl.startSession();
 		try {
-			ProvenanceService.addJSONGraph(session, JSONProvider.getGraphJSON(g).toString());
-			Model m = ProvenanceService.getModel(session);
-			JSONArray json = ProvenanceService.getJSONGraph(session);
+			impl.addJSONGraph(session, JSONProvider.getGraphJSON(g).toString());
+			Model m = impl.getModel(session);
+			JSONArray json = impl.getJSONGraph(session);
 			checkRDFGraph(g, m);
 			checkJSONGraph(g, json);
-			ProvenanceService.rollback(session);
+			impl.rollback(session);
 		} catch (Exception e) {
 			e.printStackTrace();
 			fail(e.getLocalizedMessage());
 		} finally {
-			ProvenanceService.rollback(session);			
+			impl.rollback(session);			
 		}
 	}
 
 	public void testClean() {
-		String session = ProvenanceService.startSession();
+		String session = impl.startSession();
 		try {
-			ProvenanceService.addJSONGraph(session, JSONProvider.getGraphJSON(g).toString());
-			Model m = ProvenanceService.getModel(session);
+			impl.addJSONGraph(session, JSONProvider.getGraphJSON(g).toString());
+			Model m = impl.getModel(session);
 			m.add(m.getResource("http://openprovenance.org/ontology#Resource1"), m.getProperty("http://testProperty"), "Value");
-			ProvenanceService.clean(session);
+			impl.clean(session);
 			Resource r = m.getResource("http://openprovenance.org/ontology#Resource1");
 			Object o = r.getProperty(m.getProperty("http://testProperty"));
 			assertTrue(o==null);
@@ -161,7 +164,7 @@ public class TestProvenanceService extends TestCase {
 			e.printStackTrace();
 			fail(e.getLocalizedMessage());
 		} finally {
-			ProvenanceService.rollback(session);			
+			impl.rollback(session);			
 		}
 	}
 	public void testDeleteGraph(){

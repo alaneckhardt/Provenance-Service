@@ -5,6 +5,7 @@ import java.io.PrintWriter;
 import java.io.StringReader;
 import java.net.URLDecoder;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -85,7 +86,7 @@ import com.hp.hpl.jena.vocabulary.RDF;
  * &nbsp;&nbsp;&nbsp;}<br>
  * &nbsp;&nbsp;],<br>
  * &nbsp;}&nbsp;&nbsp;&nbsp;<br>
- * 
+ *
  * @author AE
  * @version 1.0
  */
@@ -93,7 +94,7 @@ public class ProvenanceService extends javax.servlet.http.HttpServlet implements
 	/** serial version UID. */
 	private static final long serialVersionUID = 5117777133122453926L;
 	/** Implementation of ProvService. */
-	private static ProvenanceServiceImpl impl = new ProvenanceServiceImpl();
+	private static ProvenanceServiceImpl impl = null;
 
 	/**
 	 * Empty constructor.
@@ -112,6 +113,8 @@ public class ProvenanceService extends javax.servlet.http.HttpServlet implements
 	 *             ServletException
 	 */
 	protected void doGet(final HttpServletRequest request, final HttpServletResponse response) throws ServletException, IOException {
+		if(impl == null)
+			impl = new ProvenanceServiceImpl();
 		impl.initProvenance();
 		PrintWriter out = response.getWriter();
 		/** Action to perform. */
@@ -275,8 +278,16 @@ public class ProvenanceService extends javax.servlet.http.HttpServlet implements
 	}
 
 	/**
+	 * Initialises the ontologies.
+	 */
+	public static void initProvenance() {
+		if(impl == null)
+			impl = new ProvenanceServiceImpl();
+		impl.initProvenance();
+	}
+	/**
 	 * Transforms the given graph to JSON string.
-	 * 
+	 *
 	 * @param g
 	 *            Graph to be converted.
 	 * @return JSON String
@@ -297,6 +308,8 @@ public class ProvenanceService extends javax.servlet.http.HttpServlet implements
 		Properties.setBaseFolder(event.getServletContext().getRealPath("/"));
 		RDFProvider.init();
 		JSONProvider.init();
+		if(impl == null)
+			impl = new ProvenanceServiceImpl();
 		impl.initProvenance();
 		// Output a simple message to the server's console
 		System.out.println("The Provenance Service is running");
@@ -309,369 +322,15 @@ public class ProvenanceService extends javax.servlet.http.HttpServlet implements
 	public void contextDestroyed(final ServletContextEvent arg0) {
 		System.out.println("The Provenance Service - contextDestroyed");
 	}
-
-	/**
-	 * Returns the shape for given type.
-	 * 
-	 * @param type
-	 * @return
-	 */
-	 public static String getShape(String type) {
-	  return impl.getBasicTypes().get(type);
-	 }
-
-	/**
-	 * 
-	 * @return All the processes in the map.
-	 */
-	public static String[] getSessions() {
-		return impl.getSessions();
+	public static ProvenanceServiceImpl getSingleton(){
+		if(impl == null)
+			impl = new ProvenanceServiceImpl();
+		return impl;
 	}
-
-	/**
-	 * 
-	 * @return The map of processes.
-	 */
-	public static Map<String, Model> getSessionsMap() {
-		return impl.getSessionsMap();
-	}
-
-	/**
-	 * Starts the new session of creating provenance. Return sessionId.
-	 * 
-	 * @return Id of the session.
-	 */
-	public static String startSession() {
-		return impl.startSession();
-	}
-
-	/**
-	 * Adds a custom property to the given resource.
-	 * 
-	 * @param sessionId
-	 * @param node
-	 * @param property
-	 * @param value
-	 * @return
-	 * @throws ProvenanceServiceException
-	 */
-	public static void addCustomProperty(String sessionId, String node, String property, String value) throws ProvenanceServiceException {
-		impl.addCustomProperty(sessionId, node, property, value);
-	}
-
-	/**
-	 * Create an instance of given type.
-	 * 
-	 * @param type
-	 *            Type of the node
-	 * @return sessionId Id of the session.
-	 * @throws ProvenanceServiceException
-	 */
-	public static String addNode(String sessionId, String type) throws ProvenanceServiceException {
-		return impl.addNode(sessionId, type);
-	}
-
-	/**
-	 * Starts the process of creating provenance. Return rdfId of the new
-	 * process.
-	 * 
-	 * @return URI of the new process.
-	 * @throws ProvenanceServiceException
-	 */
-	public static String addProcess(String sessionId) throws ProvenanceServiceException {
-		return impl.addProcess(sessionId);
-	}
-
-	/**
-	 * Adds an agent to the provenance graph. It should be linked to the process
-	 * later.
-	 * 
-	 * @return URI of the new artifact.
-	 * @throws ProvenanceServiceException
-	 */
-	public static String addAgent(String sessionId) throws ProvenanceServiceException {
-		return impl.addAgent(sessionId);
-	}
-
-	/**
-	 * Adds an artefact to the provenance graph. It should be linked to the
-	 * process later.
-	 * 
-	 * @return URI of the new artifact.
-	 * @throws ProvenanceServiceException
-	 */
-	public static String addArtifact(String sessionId) throws ProvenanceServiceException {
-		return impl.addArtifact(sessionId);
-	}
-
-	/**
-	 * Adds title to the given object.
-	 * 
-	 * @param sessionId
-	 *            Process
-	 * @param object
-	 *            Object to receive the title
-	 * @param title
-	 *            Title.
-	 * @throws ProvenanceServiceException
-	 */
-	public static void addTitle(String sessionId, String object, String title) throws ProvenanceServiceException {
-		impl.addTitle(sessionId, object, title);
-	}
-
-	/**
-	 * Adds whole provenance graph to the given session.
-	 * 
-	 * @param sessionId
-	 *            Process
-	 */
-	public static void addJSONGraph(String sessionId, String jsonGraph) {
-		impl.addJSONGraph(sessionId, jsonGraph);
-	}
-
-	public static void addRDFGraph(String sessionId, Model input) {
-		impl.addRDFGraph(sessionId, input);
-	}
-
-	public static void addRDFGraph(String sessionId, String input) {
-		impl.addRDFGraph(sessionId, input);
-	}
-
-	/**
-	 * Adds relationship to the process. Causal relationships are e.g.
-	 * controlledBy, Used, wasGeneratedBy,...
-	 * 
-	 * @param sessionId
-	 *            URI of the process to be the relation added to.
-	 * @param type
-	 *            The type of the causal relationship.
-	 * @param from
-	 *            The subject of the relationship - this can be artifact, agent,
-	 *            or other process.
-	 * @param to
-	 *            The object of the relationship - this can be artifact, agent,
-	 *            or other process.
-	 * @return
-	 * @throws ProvenanceServiceException
-	 */
-	public static String addCausalRelationship(String sessionId, String type, String from, String to) throws ProvenanceServiceException {
-		return impl.addCausalRelationship(sessionId, type, from, to);
-	}
-
-	public static DataProvider getDataProvider() {
-		return impl.getDataProvider();
-	}
-
-	public static void setDataProvider(DataProvider dataProvider) {
-		impl.setDataProvider(dataProvider);
-	}
-
-	/**
-	 * Adds an existing resource from the RDF store to the session graph.
-	 * 
-	 * @param sessionId
-	 * @param uri
-	 * @return
-	 * @throws ProvenanceServiceException
-	 */
-	public static void addExistingResource(String sessionId, String uri) throws ProvenanceServiceException {
-		impl.addExistingResource(sessionId, uri);
-	}
-
-	/**
-	 * Adds an existing resource from the RDF store to the session graph.
-	 * 
-	 * @param sessionId
-	 * @param uri
-	 *            URI of the resource
-	 * @param type
-	 *            Type of the resource
-	 * @param title
-	 *            Title of the resource - for the visualisation purpose.
-	 * @return
-	 * @throws ProvenanceServiceException
-	 */
-	public static void addExistingResource(String sessionId, String uri, String type, String title) throws ProvenanceServiceException {
-		impl.addExistingResource(sessionId, uri, type, title);
-	}
-
-	/**
-	 * Returns the JSON representation of the Graph associated with the given
-	 * sessionId.
-	 * 
-	 * @param sessionId
-	 * @return
-	 */
-	public static JSONArray getJSONGraph(String sessionId) {
-		return impl.getJSONGraph(sessionId);
-	}
-
-	/**
-	 * Returns the Graph associated with the given sessionId.
-	 * 
-	 * @param sessionId
-	 * @return
-	 * @throws OpenRDFException
-	 */
-	public static Graph getGraph(String sessionId) {
-		return impl.getGraph(sessionId);
-
-	}
-
-	/**
-	 * Returns the RDF model associated with the given sessionId.
-	 * 
-	 * @param sessionId
-	 * @return
-	 */
-	public static Model getModel(String sessionId) {
-		return impl.getModel(sessionId);
-	}
-
-	/**
-	 * Removes the given relationship from the model.
-	 * 
-	 * @param sessionId
-	 * @param relationship
-	 *            URI of the relationship.
-	 * @return
-	 */
-	public static void removeCausalRelationShip(String sessionId, String relationship) {
-		impl.removeCausalRelationShip(sessionId, relationship);
-	}
-
-	/**
-	 * Removes the given node from the model.
-	 * 
-	 * @param sessionId
-	 * @param node
-	 * @return
-	 */
-	public static void removeNode(String sessionId, String node) {
-		impl.removeNode(sessionId, node);
-	}
-
-	/**
-	 * Cleans the RDF model, leaving only the provenance stuff in the model.
-	 * 
-	 * @param sessionId
-	 * @return
-	 * @throws ProvenanceServiceException 
-	 */
-	public static void clean(String sessionId) throws ProvenanceServiceException {
-		impl.clean(sessionId);
-	}
-
-	/**
-	 * 
-	 * @return true if commit was successful, false otherwise.
-	 * @throws IOException
-	 * @throws ProvenanceServiceException
-	 * @throws Exception
-	 *             When the RDF model of the given process is bad or does not
-	 *             satisfy policies.
-	 */
-	public static void commit(String sessionId) throws OpenRDFException, IOException, ProvenanceServiceException {
-		impl.commit(sessionId);
-	}
-
-	/**
-	 * Deletes the RDF model of the given process.
-	 * 
-	 * @param sessionId
-	 *            URI of the process
-	 */
-	public static void rollback(String sessionId) {
-		impl.rollback(sessionId);
-	}
-
-	/**
-	 * Finds the provenance graph near the given resource.
-	 * The edges to and from the resource are obtained. If a process is among
-	 * the neighoring nodes, then also its edges are obtained.
-	 * 
-	 * @param resource
-	 * @return Provenance graph near the given resource.
-	 * @throws QueryEvaluationException
-	 * @throws MalformedQueryException
-	 * @throws RepositoryException
-	 */
-	public static Graph getProvenance(String resource, String sessionId) throws OpenRDFException {
-		return impl.getProvenanceFrom(resource, sessionId);
-	}
-
-	/**
-	 * Gets the edges from the given resource.
-	 * 
-	 * @param resourceID
-	 * @return Graph containing the given resource and all edges directing from
-	 *         it.
-	 * @throws OpenRDFException
-	 */
-	public static Graph getProvenanceFrom(String resourceID, String sessionId) throws OpenRDFException {
-		return impl.getProvenanceFrom(resourceID, sessionId);
-	}
-
-	/**
-	 * Gets the edges to the given resource.
-	 * 
-	 * @param resourceID
-	 * @return Graph containing the given resource and all edges directing to
-	 *         it.
-	 * @throws OpenRDFException
-	 */
-	public static Graph getProvenanceTo(String resourceID, String sessionId) throws OpenRDFException {
-		return impl.getProvenanceTo(resourceID, sessionId);
-	}
-
-	/**
-	 * Returns the graph immediatelly around the given resource. Data are
-	 * obtained from the underlying RDF repository.
-	 * 
-	 * @param resource
-	 * @return only the edges to and from the given resource.
-	 * @throws QueryEvaluationException
-	 * @throws MalformedQueryException
-	 * @throws RepositoryException
-	 */
-	public static Graph getImmediateProvenance(String resource, String sessionId) throws OpenRDFException {
-		return impl.getImmediateProvenance(resource, sessionId);
-	}
-
-	public static Map<String, String> getBasicTypes() {
-		return impl.getBasicTypes();
-	}
-
-	public static void setBasicTypes(Map<String, String> basicTypes) {
-		impl.setBasicTypes(basicTypes);
-	}
-
-	public static void setSessions(Map<String, Model> sessions) {
-		impl.setSessions(sessions);
-	}
-
-	public static String getNamespace() {
-		return impl.getNamespace();
-	}
-
-	public static void setNamespace(String namespace) {
-		impl.setNamespace(namespace);
-	}
-
-	public static List<String> getProperties() {
-		return impl.getProperties();
-	}
-
-	public static void setProperties(List<String> properties) {
-		impl.setProperties(properties);
-	}
-
-	public static List<String> getNodes() {
-		return impl.getNodes();
-	}
-
-	public static void setNodes(List<String> nodes) {
-		impl.setNodes(nodes);
+	public static ProvenanceServiceImpl getNextImpl(){
+		ProvenanceServiceImpl impl = new ProvenanceServiceImpl();
+		impl.initProvenance();
+		return impl;
 	}
 
 }

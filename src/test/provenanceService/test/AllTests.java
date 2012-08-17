@@ -15,12 +15,14 @@ import provenanceService.JSONProvider;
 import provenanceService.Node;
 import provenanceService.Properties;
 import provenanceService.ProvenanceService;
+import provenanceService.ProvenanceServiceImpl;
 import provenanceService.RDFProvider;
 import provenanceService.Utility;
 
 
 public class AllTests extends TestCase {   
 	static DataProvider dataProvider = new DataProvider();
+	static ProvenanceServiceImpl impl;
 	public AllTests (String testName) {
 		super (testName);
 	}
@@ -31,6 +33,7 @@ public class AllTests extends TestCase {
 		Properties.setFile("test.properties");
 		RDFProvider.init();
 		JSONProvider.init();
+		impl = ProvenanceService.getSingleton();
 		TestSuite suite = new TestSuite();		
 		suite.addTest(TestSPARQLProvider.suite());   
 		suite.addTest(TestRDFProvider.suite());
@@ -43,10 +46,10 @@ public class AllTests extends TestCase {
 		if(type != null){
 			n.setTitle(Utility.getLocalName(type)+i);
 			n.setType(type);
-			n.setBasicType(ProvenanceService.getShape(type));
+			n.setBasicType(impl.getShape(type));
 		}
 		int j = 0;
-		dataProvider.init();
+		dataProvider.init(impl);
 		try {
 			dataProvider.connect();
 		} catch (RepositoryException e) {
@@ -64,7 +67,7 @@ public class AllTests extends TestCase {
 			type = "http://www.policygrid.org/provenance-generic.owl#Paper";
 		Node n = new Node("http://openprovenance.org/ontology#Resource"+i);
 		n.setType(type);
-		n.setBasicType(ProvenanceService.getShape(type));		
+		n.setBasicType(impl.getShape(type));		
 		return n;
 	}
 	public static Edge getTestEdge(int i, Node n1, Node n2, String type){
@@ -86,7 +89,7 @@ public class AllTests extends TestCase {
 				qry.append("<"+subject+"> ?p ?o. } where { ");
 				qry.append("<"+subject+"> ?p ?o. } ");
 				String query = qry.toString();
-				dataProvider.init();
+				dataProvider.init(impl);
 				dataProvider.connect();
 				GraphQuery q = dataProvider.getCon().prepareGraphQuery(QueryLanguage.SPARQL, query);				
 				GraphQueryResult result = q.evaluate();

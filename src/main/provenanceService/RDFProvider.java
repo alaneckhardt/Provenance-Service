@@ -99,7 +99,7 @@ public final class RDFProvider {
 		t = res.getProperty(RDF.type);
 		if (t != null) {
 			node.setType(t.getObject().toString());
-			node.setBasicType(ProvenanceService.getShape(node.getType()));
+			node.setBasicType(ProvenanceService.getSingleton().getShape(node.getType()));
 		}
 		try {
 			loadCustomProperties(node, res);
@@ -238,14 +238,14 @@ public final class RDFProvider {
 		Graph g = new Graph();
 		if (m == null)
 			return g;
-		for (String nodeType : ProvenanceService.getNodes()) {
+		for (String nodeType : ProvenanceService.getSingleton().getNodes()) {
 			ResIterator it = m.listResourcesWithProperty(RDF.type, m.getResource(nodeType));
 			while (it.hasNext()) {
 				Resource r = it.next();
 				g.addNode(RDFProvider.getNode(g, r));
 			}
 		}
-		for (String edgeType : ProvenanceService.getProperties()) {
+		for (String edgeType : ProvenanceService.getSingleton().getProperties()) {
 			ResIterator it = m.listResourcesWithProperty(RDF.type, m.getResource(edgeType));
 			while (it.hasNext()) {
 				Resource r = it.next();
