@@ -11,7 +11,7 @@ import junit.framework.TestSuite;
 import provenanceService.DataProvider;
 import provenanceService.Edge;
 import provenanceService.Graph;
-import provenanceService.JSONProvider;
+import provenanceService.OPMJSONProvider;
 import provenanceService.Node;
 import provenanceService.Properties;
 import provenanceService.ProvenanceService;
@@ -21,7 +21,6 @@ import provenanceService.Utility;
 
 
 public class AllTests extends TestCase {   
-	static DataProvider dataProvider = new DataProvider();
 	static ProvenanceServiceImpl impl;
 	public AllTests (String testName) {
 		super (testName);
@@ -31,9 +30,9 @@ public class AllTests extends TestCase {
 	public static Test suite() {
 		Properties.setBaseFolder("./");
 		Properties.setFile("test.properties");
-		RDFProvider.init();
-		JSONProvider.init();
 		impl = ProvenanceService.getSingleton();
+
+		impl.initProvenance();
 		TestSuite suite = new TestSuite();		
 		suite.addTest(TestSPARQLProvider.suite());   
 		suite.addTest(TestRDFProvider.suite());
@@ -49,14 +48,14 @@ public class AllTests extends TestCase {
 			n.setBasicType(impl.getShape(type));
 		}
 		int j = 0;
-		dataProvider.init(impl);
+		impl.getProvProvider().getDataProvider().init(impl);
 		try {
-			dataProvider.connect();
+			impl.getProvProvider().getDataProvider().connect();
 		} catch (RepositoryException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		for(String prop : dataProvider.getCustomProperties()){
+		for(String prop : impl.getProvProvider().getDataProvider().getCustomProperties()){
 			n.addProperty(prop, "TestProp"+i*10+j);
 			j++;
 		}
@@ -89,13 +88,13 @@ public class AllTests extends TestCase {
 				qry.append("<"+subject+"> ?p ?o. } where { ");
 				qry.append("<"+subject+"> ?p ?o. } ");
 				String query = qry.toString();
-				dataProvider.init(impl);
-				dataProvider.connect();
-				GraphQuery q = dataProvider.getCon().prepareGraphQuery(QueryLanguage.SPARQL, query);				
+				impl.getProvProvider().getDataProvider().init(impl);
+				impl.getProvProvider().getDataProvider().connect();
+				GraphQuery q = impl.getProvProvider().getDataProvider().getCon().prepareGraphQuery(QueryLanguage.SPARQL, query);				
 				GraphQueryResult result = q.evaluate();
-				dataProvider.getCon().remove(result);
-				dataProvider.getCon().commit();
-				dataProvider.disconnect();
+				impl.getProvProvider().getDataProvider().getCon().remove(result);
+				impl.getProvProvider().getDataProvider().getCon().commit();
+				impl.getProvProvider().getDataProvider().disconnect();
 			} catch (Exception e) {
 			fail(e.getLocalizedMessage());			
 		}

@@ -45,16 +45,16 @@ import com.hp.hpl.jena.vocabulary.RDF;
  * @author AE
  *
  */
-public class DataProvider {
+public abstract class DataProvider {
 	/** Connection to the RDF Repository.*/
-	private RepositoryConnection con;
+	protected RepositoryConnection con;
 	/** All the ontologies loaded into one big model. */
-	private OntModel ontologies;
+	protected OntModel ontologies;
 
 	/** List of custom properties to load. */
-	private List<String> customProperties;
+	protected List<String> customProperties;
 	
-	private ProvenanceServiceImpl impl;
+	protected ProvenanceServiceImpl impl;
 	/**
 	 * Initialises the connection to repository, loads  the ontologies.
 	 */
@@ -118,9 +118,9 @@ public class DataProvider {
 			Edge e = this.getEdge(null, s);
 			String query;
 			if (n.getBasicType() != null)
-				query = SPARQLProvider.getNodeSPARQL(n).toString();
+				query = impl.getProvProvider().getSPARQLProvider().getNodeSPARQL(n).toString();
 			else
-				query = SPARQLProvider.getEdgeSPARQL(e).toString();
+				query = impl.getProvProvider().getSPARQLProvider().getEdgeSPARQL(e).toString();
 			query = "DELETE DATA { " + query + " }";
 			Update up = getCon().prepareUpdate(
 					org.openrdf.query.QueryLanguage.SPARQL, query);
@@ -137,11 +137,9 @@ public class DataProvider {
 	 */
 	public void delete(final Model delete) throws OpenRDFException, IOException {
 		// connect();
-		getCon().prepareUpdate(
-				org.openrdf.query.QueryLanguage.SPARQL,
-				SPARQLProvider.getGraphSPARQL(getModelGraph(delete), false)
-						.toString());
-		// disconnect();
+		String query = impl.getProvProvider().getSPARQLProvider().getGraphSPARQL(impl.getProvProvider().getRDFProvider().getModelGraph(delete), false).toString();
+		Update up = getCon().prepareUpdate(org.openrdf.query.QueryLanguage.SPARQL, query);
+		up.execute();
 	}
 
 	/**
@@ -256,7 +254,7 @@ public class DataProvider {
 		return restr.iterator();
 	}
 
-	private String getEntityDescription(final String resource)
+	protected String getEntityDescription(final String resource)
 			throws RepositoryException, MalformedQueryException,
 			QueryEvaluationException {
 		// For persons, we have to get the name instead of the title.
@@ -283,32 +281,7 @@ public class DataProvider {
 	 * @param to
 	 *            0=to,1=from,2=both
 	 */
-	public void getAdjacencies(final Graph g, final Node n,final  int to) {
-		try {
-			List<String> adjacencies = null;
-			if (to == 0)
-				adjacencies = getPropertiesTo(n.getId(),
-						Properties.getString("from"));
-			else if (to == 1)
-				adjacencies = getPropertiesTo(n.getId(),
-						Properties.getString("to"));
-			else if (to == 2) {
-				adjacencies = getPropertiesTo(n.getId(),
-						Properties.getString("from"));
-				adjacencies.addAll(getPropertiesTo(n.getId(),
-						Properties.getString("to")));
-			} else
-				return;
-			for (String s : adjacencies) {
-				Edge e = getEdge(g, s);
-				if (e != null && e.getTo() != null && e.getFrom() != null)
-					n.getAdjacencies().add(e);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-	}
+	public abstract void getAdjacencies(final Graph g, final Node n,final  int to);
 
 	/**
 	 * Loads the custom properties from the RDF repository.
@@ -341,29 +314,7 @@ public class DataProvider {
 	 * @return The Node with filled properties without the adjacencies.
 	 * @throws OpenRDFException
 	 */
-	public Node getNode(final Graph g, final String resource) throws OpenRDFException {
-		if (!Utility.isURI(resource))
-			return null;
-		Node node = null;
-		if (resource == null || resource.equals(""))
-			return null;
-		if (g != null)
-			node = g.getNode(resource);
-		// Node is in the graph
-		if (node != null)
-			return node;
-
-		node = new Node(resource);
-		node.setType(getProperty(resource, Properties.getString("type")));
-		node.setTitle(getEntityDescription(resource));
-		node.setBasicType(impl.getShape(node.getType()));
-		node.setAdjacencies(new ArrayList<Edge>());
-		loadCustomProperties(node, null);
-		// if(node.getType() == null || node.getType().equals(""))
-		// return null;
-		return node;
-	}
-
+	public abstract Node getNode(final Graph g, final String resource) throws OpenRDFException;
 	/**
 	 * Finds the edge in the RDF repository.
 	 *
@@ -375,39 +326,7 @@ public class DataProvider {
 	 * @throws MalformedQueryException
 	 * @throws QueryEvaluationException
 	 */
-	public Edge getEdge(final Graph g,final  String edgeURI) throws OpenRDFException {
-		if (edgeURI == null || edgeURI.equals(""))
-			return null;
-		if (!Utility.isURI(edgeURI))
-			return null;
-		Edge edge = new Edge(edgeURI);
-		edge.setType(getProperty(edgeURI, Properties.getString("type")));
-		if ((edge.getType() == null || edge.getType().equals("")))
-			return null;
-
-		String from = getProperty(edgeURI, Properties.getString("from"));
-		if (from == null || !Utility.isURI(from))
-			return null;
-		if (g != null)
-			edge.setFrom(g.getNode(from));
-		if (edge.getFrom() == null) {
-			edge.setFrom(getNode(g, from));
-		}
-		if (edge.getFrom() == null)
-			return null;
-
-		String to = getProperty(edgeURI, Properties.getString("to"));
-		if (to == null || !Utility.isURI(to))
-			return null;
-		if (g != null)
-			edge.setTo(g.getNode(to));
-		if (edge.getTo() == null) {
-			edge.setTo(getNode(g, to));
-		}
-		if (edge.getTo() == null)
-			return null;
-		return edge;
-	}
+	public abstract Edge getEdge(final Graph g,final  String edgeURI) throws OpenRDFException;
 
 	/**
 	 * Return Node from given Resource.
@@ -415,39 +334,15 @@ public class DataProvider {
 	 * @param g
 	 * @param res
 	 * @return
+	 * @throws OpenRDFException 
 	 */
-	public Node getNode(final Graph g, final Resource res) {
+	public Node getNode(final Graph g, final Resource res) throws OpenRDFException {
 		Node node = null;
 		if (res == null)
 			return null;
 		if (!Utility.isURI(res.getURI()))
 			return null;
-		if (g != null)
-			node = g.getNode(res.getURI());
-		// Node is in the graph
-		if (node != null)
-			return node;
-
-		node = new Node(res.getURI());
-		Statement t = res.getProperty(res.getModel().getProperty(
-				Properties.getString("title")));
-		if (t != null)
-			node.setTitle(t.getString());
-		// else
-		// node.setTitle(Utility.getLocalName(res.getURI()));
-
-		t = res.getProperty(RDF.type);
-		if (t != null) {
-			node.setType(t.getObject().toString());
-			node.setBasicType(impl.getShape(node.getType()));
-		}
-		try {
-			loadCustomProperties(node, res);
-		} catch (OpenRDFException e) {
-			// This shoudln't happen at all.
-			e.printStackTrace();
-		}
-		return node;
+		return getNode(g, res.getURI());
 	}
 
 	/**
@@ -465,44 +360,7 @@ public class DataProvider {
 			return null;
 		if (!Utility.isURI(edge.getURI()))
 			return null;
-		if (edge.getProperty(Utility.getProp("from")) == null
-				|| edge.getProperty(Utility.getProp("to")) == null) {
-			return null;
-		}
-		Edge e = new Edge(edge.getURI());
-		Statement t = edge.getProperty(RDF.type);
-		if (t != null)
-			e.setType(t.getObject().toString());
-
-		Resource tmp = edge.getProperty(Utility.getProp("from")).getResource();
-		if (tmp == null || !Utility.isURI(tmp.getURI()))
-			return null;
-		if (g != null)
-			e.setFrom(g.getNode(tmp.getURI()));
-		if (e.getFrom() == null) {
-			e.setFrom(getNode(g, tmp));
-		}
-		if (e.getFrom() == null)
-			return null;
-
-		tmp = edge.getProperty(Utility.getProp("to")).getResource();
-		if (tmp == null || !Utility.isURI(tmp.getURI()))
-			return null;
-		if (g != null)
-			e.setTo(g.getNode(tmp.getURI()));
-		if (e.getTo() == null) {
-			e.setTo(getNode(g, tmp));
-		}
-		if (e.getTo() == null)
-			return null;
-
-		// Add the edge only if everything's all right
-		if (e.getFrom() != null && e.getTo() != null) {
-			e.getFrom().getAdjacencies().add(e);
-			e.getTo().getAdjacencies().add(e);
-		} else
-			return null;
-		return e;
+		return getEdge(g, edge.getURI());
 	}
 
 	public Graph getAllProvenance() {
@@ -555,82 +413,13 @@ public class DataProvider {
 	}
 
 	/**
-	 * Return the RDF representation of an edge.
-	 * 
-	 * @param e
-	 *            Edge to be represented.
-	 * @return
-	 */
-	public Model getEdgeModel(final Edge e) {
-		Model m = ModelFactory.createDefaultModel();
-		if (e == null)
-			return m;
-		Resource edge = m.createResource(e.getId());
-		m.add(edge, RDF.type, m.createResource(e.getType()));
-		Resource n1 = m.createResource(e.getFrom().getId());
-		m.add(edge, Utility.getProp("from"), n1);
-
-		Resource n2 = m.createResource(e.getTo().getId());
-		m.add(edge, Utility.getProp("to"), n2);
-		return m;
-	}
-
-	/**
-	 * Return the RDF representation of a graph.
-	 * 
-	 * @param g
-	 * @return
-	 */
-	public Model getGraphModel(final Graph g) {
-		Model m = ModelFactory.createDefaultModel();
-		for (Node n : g.getNodes()) {
-			m.add(RDFProvider.getNodeModel(n));
-		}
-		return m;
-	}
-
-	/**
-	 * Return the Graph representation of a rdf model.
-	 * 
-	 * @param m
-	 * @return
-	 */
-	public Graph getModelGraph(final Model m) {
-		Graph g = new Graph();
-		if (m == null)
-			return g;
-		for (String nodeType : impl.getNodes()) {
-			ResIterator it = m.listResourcesWithProperty(RDF.type,
-					m.getResource(nodeType));
-			while (it.hasNext()) {
-				Resource r = it.next();
-				g.addNode(RDFProvider.getNode(g, r));
-			}
-		}
-		for (String edgeType : impl.getProperties()) {
-			ResIterator it = m.listResourcesWithProperty(RDF.type,
-					m.getResource(edgeType));
-			while (it.hasNext()) {
-				Resource r = it.next();
-				try {
-					g.addEdge(RDFProvider.getEdge(g, r));
-				} catch (OpenRDFException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-		}
-		return g;
-	}
-
-	/**
 	 * Inserts node into the RDF repository.
 	 * 
 	 * @param n
 	 * @return
 	 */
 	public int insertNode(final Node n) {
-		Model m = RDFProvider.getNodeModel(n);
+		Model m = impl.getProvProvider().getRDFProvider().getNodeModel(n);
 		try {
 			write(m);
 		} catch (Exception e) {
@@ -649,7 +438,7 @@ public class DataProvider {
 	 * @return
 	 */
 	public int insertEdge(final Edge e) {
-		Model m = getEdgeModel(e);
+		Model m = impl.getProvProvider().getRDFProvider().getEdgeModel(e);
 		try {
 			write(m);
 		} catch (Exception ex) {
@@ -667,7 +456,7 @@ public class DataProvider {
 	 * @return
 	 */
 	public int insertGraph(final Graph g) {
-		Model m = getGraphModel(g);
+		Model m = impl.getProvProvider().getRDFProvider().getGraphModel(g);
 		try {
 			write(m);
 		} catch (Exception ex) {
@@ -688,7 +477,7 @@ public class DataProvider {
 	 * @throws MalformedQueryException
 	 * @throws QueryEvaluationException
 	 */
-	private String getProperty(final String subject, final String property)
+	protected String getProperty(final String subject, final String property)
 			throws RepositoryException, MalformedQueryException,
 			QueryEvaluationException {
 		StringBuffer qry = new StringBuffer(1024);
@@ -708,7 +497,7 @@ public class DataProvider {
 	 * @throws MalformedQueryException
 	 */
 	@SuppressWarnings("unused")
-	private List<String> getProperties(final String subject, final String property)
+	protected List<String> getProperties(final String subject, final String property)
 			throws RepositoryException, QueryEvaluationException,
 			MalformedQueryException {
 		StringBuffer qry = new StringBuffer(1024);
@@ -717,7 +506,7 @@ public class DataProvider {
 		return executeArraySparqlQuery(qry);
 	}
 
-	private List<String> getPropertiesTo(final String subject, final String property)
+	protected List<String> getPropertiesTo(final String subject, final String property)
 			throws RepositoryException, QueryEvaluationException,
 			MalformedQueryException {
 		StringBuffer qry = new StringBuffer(1024);
@@ -735,7 +524,7 @@ public class DataProvider {
 	 * @throws QueryEvaluationException
 	 * @throws MalformedQueryException
 	 */
-	private List<String> executeArraySparqlQuery(final StringBuffer qry)
+	protected List<String> executeArraySparqlQuery(final StringBuffer qry)
 			throws RepositoryException, QueryEvaluationException,
 			MalformedQueryException {
 		List<String> resource = new ArrayList<String>();
@@ -763,7 +552,7 @@ public class DataProvider {
 	 * @throws MalformedQueryException
 	 * @throws QueryEvaluationException
 	 */
-	private String executeSparqlQuery(final StringBuffer qry)
+	protected String executeSparqlQuery(final StringBuffer qry)
 			throws RepositoryException, MalformedQueryException,
 			QueryEvaluationException {
 		String resource = null;

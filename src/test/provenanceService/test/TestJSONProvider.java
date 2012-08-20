@@ -7,7 +7,6 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import provenanceService.Edge;
 import provenanceService.Graph;
-import provenanceService.JSONProvider;
 import provenanceService.Node;
 import provenanceService.Properties;
 import provenanceService.Utility;
@@ -53,7 +52,7 @@ public class TestJSONProvider extends TestCase {
 	public void testGetNode() {
 		try {
 			int i = 2;
-			Node n = JSONProvider.getNode(null, getTestJSONNode(i));
+			Node n = AllTests.impl.getProvProvider().getJSONProvider().getNode(null, getTestJSONNode(i));
 			assertTrue(n != null);
 			assertTrue(n.getBasicType().equals("Artifact"));
 			assertTrue(n.getType().equals("http://www.policygrid.org/provenance-generic.owl#Paper"));
@@ -72,11 +71,11 @@ public class TestJSONProvider extends TestCase {
 			JSONObject n2 = getTestJSONNode(i+2);
 			JSONObject edge = getTestJSONEdge(1, n1, n2);
 			Graph g = new Graph();
-			Node node1 = JSONProvider.getNode(g, n1);
-			Node node2 = JSONProvider.getNode(g, n2);
+			Node node1 = AllTests.impl.getProvProvider().getJSONProvider().getNode(g, n1);
+			Node node2 = AllTests.impl.getProvProvider().getJSONProvider().getNode(g, n2);
 			g.addNode(node1);
 			g.addNode(node2);
-			Edge e = JSONProvider.getEdge(g, edge);
+			Edge e = AllTests.impl.getProvProvider().getJSONProvider().getEdge(g, edge);
 			assertTrue(e != null);
 			assertTrue(e.getType().equals("http://openprovenance.org/ontology#WasGeneratedBy"));
 			assertTrue(e.getId().equals("http://openprovenance.org/ontology#Edge"+i));
@@ -93,17 +92,17 @@ public class TestJSONProvider extends TestCase {
 		try {
 			int i = 1;
 			Node n = AllTests.getTestNode(i, null);
-			JSONObject node = JSONProvider.getNodeJSON(n);
+			JSONObject node = AllTests.impl.getProvProvider().getJSONProvider().getNodeJSON(n);
 			assertTrue(node != null);
 			assertTrue(n.equals(node));
 			i = 2;
 			n = AllTests.getTestNode(i, "http://www.policygrid.org/provenance-generic.owl#Paper");
-			node = JSONProvider.getNodeJSON(n);
+			node = AllTests.impl.getProvProvider().getJSONProvider().getNodeJSON(n);
 			assertTrue(node != null);
 			assertTrue(n.equals(node));
 			i = 3;
 			n = AllTests.getTestNodeNoTitle(i, null);
-			node = JSONProvider.getNodeJSON(n);
+			node = AllTests.impl.getProvProvider().getJSONProvider().getNodeJSON(n);
 			assertTrue(node != null);
 			assertTrue(n.equals(node));
 		} catch (Exception e) {
@@ -118,14 +117,14 @@ public class TestJSONProvider extends TestCase {
 			Node n1 = AllTests.getTestNode(i, null);
 			Node n2 = AllTests.getTestNode(i, null);
 			Edge e = AllTests.getTestEdge(i,n1,n2, null);
-			JSONObject edge = JSONProvider.getEdgeJSON(e);
+			JSONObject edge = AllTests.impl.getProvProvider().getJSONProvider().getEdgeJSON(e);
 			assertTrue(edge != null);
 			assertTrue(e.equals(edge));
 			i = 2;
 			n1 = AllTests.getTestNode(i, "http://www.policygrid.org/provenance-generic.owl#Paper");
 			n2 = AllTests.getTestNodeNoTitle(i, null);
 			e = AllTests.getTestEdge(i,n1,n2, null);
-			edge = JSONProvider.getEdgeJSON(e);
+			edge = AllTests.impl.getProvProvider().getJSONProvider().getEdgeJSON(e);
 			assertTrue(edge != null);
 			assertTrue(e.equals(edge));
 		} catch (Exception e) {

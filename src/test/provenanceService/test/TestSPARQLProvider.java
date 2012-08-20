@@ -30,7 +30,7 @@ public class TestSPARQLProvider extends TestCase {
 		try {
 			int i = 1;
 			Node n = AllTests.getTestNode(i, "http://www.policygrid.org/provenance-generic.owl#Paper");
-			StringBuilder node = SPARQLProvider.getNodeSPARQL(n);
+			StringBuilder node = AllTests.impl.getProvProvider().getSPARQLProvider().getNodeSPARQL(n);
 			assertTrue(node != null);
 			assertTrue(node.toString().contains(n.getId()));
 			assertTrue(node.toString().contains(n.getType()));
@@ -49,7 +49,7 @@ public class TestSPARQLProvider extends TestCase {
 			Node n1 = AllTests.getTestNode(i, null);
 			Node n2 = AllTests.getTestNode(i, null);
 			Edge e = AllTests.getTestEdge(i,n1,n2, null);
-			StringBuilder edge = SPARQLProvider.getEdgeSPARQL(e);
+			StringBuilder edge = AllTests.impl.getProvProvider().getSPARQLProvider().getEdgeSPARQL(e);
 			assertTrue(edge != null);
 			assertTrue(edge.toString().contains(e.getId()));
 		} catch (Exception e) {
@@ -60,7 +60,7 @@ public class TestSPARQLProvider extends TestCase {
 	public void testGetGraphSPARQL(){
 		try {
 			Graph g = AllTests.getTestGraph();
-			StringBuilder graph = SPARQLProvider.getGraphSPARQL(g, true);
+			StringBuilder graph = AllTests.impl.getProvProvider().getSPARQLProvider().getGraphSPARQL(g, true);
 			assertTrue(graph != null);
 			assertTrue(graph.toString().contains(g.get(0).getId()));
 			assertTrue(graph.toString().contains(g.get(1).getId()));

@@ -1,0 +1,131 @@
+package provenanceService;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.openrdf.OpenRDFException;
+import org.openrdf.query.MalformedQueryException;
+import org.openrdf.query.QueryEvaluationException;
+import org.openrdf.repository.RepositoryException;
+
+/**
+ * Class providing functions for manipulation with RDF. Conversions between
+ * Graph and RDF and querying the underlying RDF repository as well.
+ *
+ * @author AE
+ *
+ */
+public class OPMDataProvider extends DataProvider {
+	/**
+	 * Loads the adjacencies of the given node.
+	 *
+	 * @param g
+	 *            The graph to be used.
+	 * @param n
+	 *            Node which adjacencies are returned.
+	 * @param to
+	 *            0=to,1=from,2=both
+	 */
+	public void getAdjacencies(final Graph g, final Node n,final  int to) {
+		try {
+			List<String> adjacencies = null;
+			if (to == 0)
+				adjacencies = getPropertiesTo(n.getId(),
+						Properties.getString("from"));
+			else if (to == 1)
+				adjacencies = getPropertiesTo(n.getId(),
+						Properties.getString("to"));
+			else if (to == 2) {
+				adjacencies = getPropertiesTo(n.getId(),
+						Properties.getString("from"));
+				adjacencies.addAll(getPropertiesTo(n.getId(),
+						Properties.getString("to")));
+			} else
+				return;
+			for (String s : adjacencies) {
+				Edge e = getEdge(g, s);
+				if (e != null && e.getTo() != null && e.getFrom() != null)
+					n.getAdjacencies().add(e);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	/**
+	 * Gets the properties of the node from RDF repository. Does not load the
+	 * adjacencies though, in order to avoid greedy crawl of the whole graph.
+	 *
+	 * @param g
+	 * @param resource
+	 * @return The Node with filled properties without the adjacencies.
+	 * @throws OpenRDFException
+	 */
+	public Node getNode(final Graph g, final String resource) throws OpenRDFException {
+		if (!Utility.isURI(resource))
+			return null;
+		Node node = null;
+		if (resource == null || resource.equals(""))
+			return null;
+		if (g != null)
+			node = g.getNode(resource);
+		// Node is in the graph
+		if (node != null)
+			return node;
+
+		node = new Node(resource);
+		node.setType(getProperty(resource, Properties.getString("type")));
+		node.setTitle(getEntityDescription(resource));
+		node.setBasicType(impl.getShape(node.getType()));
+		node.setAdjacencies(new ArrayList<Edge>());
+		loadCustomProperties(node, null);
+		return node;
+	}
+
+	/**
+	 * Finds the edge in the RDF repository.
+	 *
+	 * @param g
+	 * @param edgeURI
+	 *            URI of the edge in the repository.
+	 * @return New Edge object.
+	 * @throws RepositoryException
+	 * @throws MalformedQueryException
+	 * @throws QueryEvaluationException
+	 */
+	public Edge getEdge(final Graph g,final  String edgeURI) throws OpenRDFException {
+		if (edgeURI == null || edgeURI.equals(""))
+			return null;
+		if (!Utility.isURI(edgeURI))
+			return null;
+		Edge edge = new Edge(edgeURI);
+		edge.setType(getProperty(edgeURI, Properties.getString("type")));
+		if ((edge.getType() == null || edge.getType().equals("")))
+			return null;
+
+		String from = getProperty(edgeURI, Properties.getString("from"));
+		if (from == null || !Utility.isURI(from))
+			return null;
+		if (g != null)
+			edge.setFrom(g.getNode(from));
+		if (edge.getFrom() == null) {
+			edge.setFrom(getNode(g, from));
+		}
+		if (edge.getFrom() == null)
+			return null;
+
+		String to = getProperty(edgeURI, Properties.getString("to"));
+		if (to == null || !Utility.isURI(to))
+			return null;
+		if (g != null)
+			edge.setTo(g.getNode(to));
+		if (edge.getTo() == null) {
+			edge.setTo(getNode(g, to));
+		}
+		if (edge.getTo() == null)
+			return null;
+		return edge;
+	}
+
+}

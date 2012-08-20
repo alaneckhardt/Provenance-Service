@@ -5,16 +5,15 @@ import java.util.List;
 
 import com.hp.hpl.jena.iri.IRI;
 import com.hp.hpl.jena.iri.IRIFactory;
-import com.hp.hpl.jena.vocabulary.RDF;
 
 /** Class for transformation between the Graph and JSON representation of the
  * provenance.
  *
  * @author AE */
-public final class SPARQLProvider {
+public abstract class SPARQLProvider {
 
 	/** Private constructor. */
-	private SPARQLProvider() {
+	public SPARQLProvider() {
 	}
 
 	/** Nothing at the moment. */
@@ -25,7 +24,7 @@ public final class SPARQLProvider {
 	 *
 	 * @param s String.
 	 * @return String with the brackets. */
-	private static String addBrackets(final String s) {
+	protected String addBrackets(final String s) {
 		return "<" + s + "> ";
 	}
 	/**
@@ -35,7 +34,7 @@ public final class SPARQLProvider {
 	 * @param s3 Object
 	 * @return String with the triple.
 	 */
-	private static String getTriple(final String s1, final String s2, final String s3) {
+	protected String getTriple(final String s1, final String s2, final String s3) {
 		IRIFactory iriFactory = IRIFactory.semanticWebImplementation();
 		boolean includeWarnings = false;
 		IRI iri;
@@ -52,42 +51,20 @@ public final class SPARQLProvider {
 	 *
 	 * @param n Node.
 	 * @return SPARQL notation of the node content.*/
-	public static StringBuilder getNodeSPARQL(final Node n) {
-		StringBuilder node = new StringBuilder();
-		if (n.getTitle() != null)
-			node.append(getTriple(n.getId(), Properties.getString("title"), n.getTitle()));
-
-		if (n.getType() != null)
-			node.append(getTriple(n.getId(), RDF.type.getURI(), n.getType()));
-		for (String name : n.getProperties().keySet()) {
-			Object value = n.getProperty(name);
-			node.append(getTriple(n.getId(), name, value.toString()));
-		}
-		return node;
-	}
+	public abstract StringBuilder getNodeSPARQL(final Node n);
 
 	/** Return the JSON representation of an edge.
 	 *
 	 * @param e Edge.
 	 * @return SPARQL notation of the edge content.*/
-	public static StringBuilder getEdgeSPARQL(final Edge e) {
-		StringBuilder edge = new StringBuilder();
-		edge.append(getTriple(e.getId(), Properties.getString("to"), e.getTo().getId()));
-		edge.append(getTriple(e.getId(), Properties.getString("from"), e.getFrom().getId()));
-		edge.append(getTriple(e.getId(), RDF.type.getURI(), e.getType()));
-		for (String name : e.getProperties().keySet()) {
-			Object value = e.getProperty(name);
-			edge.append(getTriple(e.getId(), name, value.toString()));
-		}
-		return edge;
-	}
+	public abstract StringBuilder getEdgeSPARQL(final Edge e);
 
 	/** Return the SPARQL representation of a graph.
 	 *
 	 * @param g Graph
 	 * @param insert if true, data are inserted, otherwise deleted.
 	 * @return SPARQL notation of the graph content.*/
-	public static StringBuilder getGraphSPARQL(final Graph g, final boolean insert) {
+	public StringBuilder getGraphSPARQL(final Graph g, final boolean insert) {
 		String action = "INSERT";
 		if (!insert)
 			action = "DELETE";

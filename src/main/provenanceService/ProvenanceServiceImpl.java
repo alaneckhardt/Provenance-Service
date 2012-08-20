@@ -2,6 +2,8 @@ package provenanceService;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -92,15 +94,16 @@ public class ProvenanceServiceImpl {
 	 * commit method. */
 	private Map<String, Model> sessions = null;
 	/** List of the resources to delete. */
-	private Map<String, List<String>> sessionsDelete = null;
+	private Map<String, Model> sessionsDelete = null;
 	/** Contains mapping from subclasses to Agent, Artifact, Process. */
 	private Map<String, String> basicTypes = new HashMap<String, String>();
 	/**Types of edges.*/
 	private List<String> properties = new ArrayList<String>();
 	/**Types of nodes.*/
 	private List<String> nodes = new ArrayList<String>();
-	/** Access to the RDF repository. */
-	private DataProvider dataProvider = new DataProvider();
+	/** Creates instances of a specific provenance model, such as PROV-O or OPM.*/
+	private ProvenanceModel provProvider;
+
 	/**
 	 * Public constructor.
 	 */
@@ -113,15 +116,26 @@ public class ProvenanceServiceImpl {
 	public void initProvenance() {
 		if (sessions != null)
 			return;
-		RDFProvider.init();
-		JSONProvider.init();
-		this.dataProvider = new DataProvider();
-		this.dataProvider.init(this);
 
 		namespace = Properties.getString("namespace");
+        try {
+    		//provProvider = Class.forName(Properties.getString("ProvenanceModel"));
+            Class cls = Class.forName(Properties.getString("ProvenanceModel"));
+           Class partypes[] = new Class[1];
+            partypes[0] = ProvenanceServiceImpl.class;
+            Constructor ct = cls.getConstructor(partypes);
+            Object arglist[] = new Object[1];
+            arglist[0] = this;
+			provProvider = (ProvenanceModel) ct.newInstance(arglist);
+			provProvider.getRDFProvider().init();
+			provProvider.getJSONProvider().init();
+			provProvider.getDataProvider().init(this);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		sessions = new HashMap<String, Model>();
 
-		sessionsDelete = new HashMap<String, List<String>>();
+		sessionsDelete = new HashMap<String, Model>();
 		initNodes();
 		initEdges();
 	}
@@ -132,10 +146,10 @@ public class ProvenanceServiceImpl {
 	public void initEdges() {
 
 		properties = new ArrayList<String>();
-		Vector<String> subClasses = dataProvider.getSubclasses(Properties.getString("edge"));
+		Vector<String> subClasses = provProvider.getDataProvider().getSubclasses(Properties.getString("edge"));
 		properties.addAll(subClasses);
 		for (int i = 0; i < properties.size(); i++) {
-			subClasses = dataProvider.getSubclasses(properties.get(i));
+			subClasses = provProvider.getDataProvider().getSubclasses(properties.get(i));
 			properties.addAll(subClasses);
 		}
 	}
@@ -151,7 +165,7 @@ public class ProvenanceServiceImpl {
 		nodes = new ArrayList<String>();
 		// Agents subclasses
 		nodes.add(Properties.getString("agent"));
-		subClasses = dataProvider.getSubclasses(Properties.getString("agent"));
+		subClasses = provProvider.getDataProvider().getSubclasses(Properties.getString("agent"));
 		nodes.addAll(subClasses);
 		for (int i = 0; i < subClasses.size(); i++) {
 			getBasicTypes().put(subClasses.get(i), "Agent");
@@ -159,7 +173,7 @@ public class ProvenanceServiceImpl {
 
 		// Artifacts subclasses
 		nodes.add(Properties.getString("artifact"));
-		subClasses = dataProvider.getSubclasses(Properties.getString("artifact"));
+		subClasses = provProvider.getDataProvider().getSubclasses(Properties.getString("artifact"));
 		nodes.addAll(subClasses);
 		for (int i = 0; i < subClasses.size(); i++) {
 			getBasicTypes().put(subClasses.get(i), "Artifact");
@@ -167,7 +181,7 @@ public class ProvenanceServiceImpl {
 
 		// Processes subclasses
 		nodes.add(Properties.getString("process"));
-		subClasses = dataProvider.getSubclasses(Properties.getString("process"));
+		subClasses = provProvider.getDataProvider().getSubclasses(Properties.getString("process"));
 		nodes.addAll(subClasses);
 		for (int i = 0; i < subClasses.size(); i++) {
 			getBasicTypes().put(subClasses.get(i), "Process");
@@ -241,6 +255,10 @@ public class ProvenanceServiceImpl {
 			res.addProperty(p, model.createResource(value));
 
 	}
+	
+	public String getNewURI(){
+		return namespace + UUID.randomUUID().toString();
+	}
 
 	/** Create an instance of given type.
 	 *
@@ -253,13 +271,7 @@ public class ProvenanceServiceImpl {
 		Model model = sessions.get(sessionId);
 		if (model == null)
 			throw new ProvenanceServiceException("Error - no session " + sessionId);
-
-		String instanceId = namespace + UUID.randomUUID().toString();
-		Resource res = model.createResource(instanceId);
-		model.createResource(type);
-		model.add(res, RDF.type, model.createResource(type));
-		return res.getURI();
-
+		return provProvider.addNode(model, type);
 	}
 
 	/** Starts the process of creating provenance. Return rdfId of the new
@@ -322,8 +334,8 @@ public class ProvenanceServiceImpl {
 	public void addJSONGraph(final String sessionId, final String jsonGraph) {
 		JSONArray nodes = (JSONArray) JSONSerializer.toJSON(jsonGraph);
 
-		Graph g = JSONProvider.getGraph(nodes);
-		sessions.get(sessionId).add(RDFProvider.getGraphModel(g));
+		Graph g = provProvider.getJSONProvider().getGraph(nodes);
+		sessions.get(sessionId).add(provProvider.getRDFProvider().getGraphModel(g));
 	}
 	/**
 	 * @param sessionId Id of the session.
@@ -359,32 +371,24 @@ public class ProvenanceServiceImpl {
 	 * @throws ProvenanceServiceException */
 	public String addCausalRelationship(final String sessionId, final String type, final String from, final String to) throws ProvenanceServiceException {
 		Model model = sessions.get(sessionId);
-		String relationId = namespace + UUID.randomUUID().toString();
 
 		if (model == null)
 			throw new ProvenanceServiceException("Error - no session " + sessionId);
-		Resource relationship = model.createResource(relationId);
-		Resource c = model.getResource(from);
-		Resource e = model.getResource(to);
-		Resource r = model.getResource(type);
-		model.add(relationship, RDF.type, r);
-		model.add(relationship, Utility.getProp("from"), c);
-		model.add(relationship, Utility.getProp("to"), e);
-		return relationship.getURI();
+		return provProvider.addCausalRelationship(model, type, from, to);
 	}
 
 	/**
 	 * @return dataprovider.
 	 */
 	public DataProvider getDataProvider() {
-		return dataProvider;
+		return provProvider.getDataProvider();
 	}
 
 	/**
 	 * @param dataProvider Dataprovider to use.
 	 */
 	public void setDataProvider(final DataProvider dataProvider) {
-		this.dataProvider = dataProvider;
+		provProvider.setDataProvider(dataProvider);
 	}
 
 	/** Adds an existing resource from the RDF store to the session graph.
@@ -396,7 +400,7 @@ public class ProvenanceServiceImpl {
 	public void addExistingResource(final String sessionId, final String uri) throws ProvenanceServiceException {
 		Node n;
 		try {
-			n = dataProvider.getNode(null, uri);
+			n = provProvider.getDataProvider().getNode(null, uri);
 			addExistingResource(sessionId, uri, n.getType(), n.getTitle());
 		} catch (org.openrdf.OpenRDFException e) {
 			e.printStackTrace();
@@ -431,7 +435,7 @@ public class ProvenanceServiceImpl {
 	 * @return */
 	public JSONArray getJSONGraph(final String sessionId) {
 		Graph g = getGraph(sessionId);
-		return JSONProvider.getGraphJSON(g);
+		return provProvider.getJSONProvider().getGraphJSON(g);
 	}
 
 	/** Returns the Graph associated with the given sessionId.
@@ -456,7 +460,7 @@ public class ProvenanceServiceImpl {
 		 * for(Node n : g.getNodes()){
 		 * RDFProvider.getAdjacencies(g, n, 2);
 		 * } */
-		return RDFProvider.getModelGraph(model);
+		return provProvider.getRDFProvider().getModelGraph(model);
 
 	}
 
@@ -482,11 +486,24 @@ public class ProvenanceServiceImpl {
 			model.remove(relation.listProperties());
 		else {
 			if (sessionsDelete.get(sessionId) == null)
-				sessionsDelete.put(sessionId, new ArrayList<String>());
-			sessionsDelete.get(sessionId).add(relationship);
+				sessionsDelete.put(sessionId,  ModelFactory.createDefaultModel());
+			Edge e;
+			try {
+				e = provProvider.getDataProvider().getEdge(null, relationship);
+				sessionsDelete.get(sessionId).add(provProvider.getRDFProvider().getEdgeModel(e));
+			} catch (OpenRDFException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 		}
 	}
 
+	public ProvenanceModel getProvProvider() {
+		return provProvider;
+	}
+	public void setProvProvider(ProvenanceModel provProvider) {
+		this.provProvider = provProvider;
+	}
 	/** Removes the given node from the model.
 	 *
 	 * @param sessionId Id of the session.
@@ -499,8 +516,15 @@ public class ProvenanceServiceImpl {
 			model.remove(res.listProperties());
 		else {
 			if (sessionsDelete.get(sessionId) == null)
-				sessionsDelete.put(sessionId, new ArrayList<String>());
-			sessionsDelete.get(sessionId).add(node);
+				sessionsDelete.put(sessionId, ModelFactory.createDefaultModel());
+			Node n;
+			try {
+				n = provProvider.getDataProvider().getNode(null, node);
+				sessionsDelete.get(sessionId).add(provProvider.getRDFProvider().getNodeModel(n));
+			} catch (OpenRDFException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 		}
 	}
 
@@ -514,7 +538,7 @@ public class ProvenanceServiceImpl {
 			Model m = sessions.get(sessionId);
 			Graph g = getGraph(sessionId);
 			m.removeAll();
-			m.add(RDFProvider.getGraphModel(g));
+			m.add(provProvider.getRDFProvider().getGraphModel(g));
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new ProvenanceServiceException("Error " + e.getLocalizedMessage());
@@ -533,9 +557,9 @@ public class ProvenanceServiceImpl {
 		if (m == null)
 			throw new ProvenanceServiceException("Error - no session " + sessionId);
 		try {
-			dataProvider.write(m);
+			provProvider.getDataProvider().write(m);
 			if (sessionsDelete.get(sessionId) != null) {
-				dataProvider.delete(sessionsDelete.get(sessionId));
+				provProvider.getDataProvider().delete(sessionsDelete.get(sessionId));
 			}
 		} catch (OpenRDFException e) {
 			e.printStackTrace();
@@ -592,10 +616,10 @@ public class ProvenanceServiceImpl {
 		Graph g = new Graph();
 		Graph g2 = new Graph();
 		if (sessions.containsKey(sessionId) && sessions.get(sessionId) != null)
-			g2 = RDFProvider.getModelGraph(sessions.get(sessionId));
-		Node n = dataProvider.getNode(g2, resourceID);
+			g2 = provProvider.getRDFProvider().getModelGraph(sessions.get(sessionId));
+		Node n = provProvider.getDataProvider().getNode(g2, resourceID);
 		g.addNode(n);
-		dataProvider.getAdjacencies(g2, n, 1);
+		provProvider.getDataProvider().getAdjacencies(g2, n, 1);
 		return g;
 	}
 
@@ -610,10 +634,10 @@ public class ProvenanceServiceImpl {
 		Graph g = new Graph();
 		Graph g2 = new Graph();
 		if (sessions.containsKey(sessionId) && sessions.get(sessionId) != null)
-			g2 = RDFProvider.getModelGraph(sessions.get(sessionId));
-		Node n = dataProvider.getNode(g2, resourceID);
+			g2 = provProvider.getRDFProvider().getModelGraph(sessions.get(sessionId));
+		Node n = provProvider.getDataProvider().getNode(g2, resourceID);
 		g.addNode(n);
-		dataProvider.getAdjacencies(g2, n, 0);
+		provProvider.getDataProvider().getAdjacencies(g2, n, 0);
 		return g;
 	}
 
