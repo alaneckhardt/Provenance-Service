@@ -10,11 +10,11 @@ import org.openrdf.OpenRDFException;
 
 import provenanceService.Edge;
 import provenanceService.Graph;
-import provenanceService.OPMJSONProvider;
 import provenanceService.Node;
 import provenanceService.Properties;
 import provenanceService.ProvenanceService;
 import provenanceService.ProvenanceServiceImpl;
+import provenanceService.provenanceModel.OPMJSONProvider;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.Resource;

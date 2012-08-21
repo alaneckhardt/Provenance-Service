@@ -1,4 +1,4 @@
-package provenanceService;
+package provenanceService.provenanceModel;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -6,6 +6,11 @@ import java.io.IOException;
 import java.util.List;
 
 import org.openrdf.OpenRDFException;
+
+import provenanceService.Edge;
+import provenanceService.Graph;
+import provenanceService.Node;
+import provenanceService.Properties;
 
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.rdf.model.Model;

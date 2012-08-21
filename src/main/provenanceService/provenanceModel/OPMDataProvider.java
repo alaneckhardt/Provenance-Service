@@ -1,4 +1,4 @@
-package provenanceService;
+package provenanceService.provenanceModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -7,6 +7,13 @@ import org.openrdf.OpenRDFException;
 import org.openrdf.query.MalformedQueryException;
 import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.repository.RepositoryException;
+
+import provenanceService.DataProvider;
+import provenanceService.Edge;
+import provenanceService.Graph;
+import provenanceService.Node;
+import provenanceService.Properties;
+import provenanceService.Utility;
 
 /**
  * Class providing functions for manipulation with RDF. Conversions between

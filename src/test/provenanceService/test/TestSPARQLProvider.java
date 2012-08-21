@@ -7,7 +7,7 @@ import provenanceService.Edge;
 import provenanceService.Graph;
 import provenanceService.Node;
 import provenanceService.Properties;
-import provenanceService.SPARQLProvider;
+import provenanceService.provenanceModel.SPARQLProvider;
 
 
 public class TestSPARQLProvider extends TestCase {   

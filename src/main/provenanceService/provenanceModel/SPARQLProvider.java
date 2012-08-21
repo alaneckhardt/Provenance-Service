@@ -1,7 +1,11 @@
-package provenanceService;
+package provenanceService.provenanceModel;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import provenanceService.Edge;
+import provenanceService.Graph;
+import provenanceService.Node;
 
 import com.hp.hpl.jena.iri.IRI;
 import com.hp.hpl.jena.iri.IRIFactory;

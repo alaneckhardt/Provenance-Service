@@ -29,6 +29,12 @@ import org.openrdf.rio.RDFFormat;
 import com.hp.hpl.jena.ontology.OntClass;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.Restriction;
+import com.hp.hpl.jena.query.Query;
+import com.hp.hpl.jena.query.QueryExecution;
+import com.hp.hpl.jena.query.QueryExecutionFactory;
+import com.hp.hpl.jena.query.QueryFactory;
+import com.hp.hpl.jena.query.QuerySolution;
+import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.ResIterator;
@@ -118,9 +124,9 @@ public abstract class DataProvider {
 			Edge e = this.getEdge(null, s);
 			String query;
 			if (n.getBasicType() != null)
-				query = impl.getProvProvider().getSPARQLProvider().getNodeSPARQL(n).toString();
+				query = impl.getSPARQLProvider().getNodeSPARQL(n).toString();
 			else
-				query = impl.getProvProvider().getSPARQLProvider().getEdgeSPARQL(e).toString();
+				query = impl.getSPARQLProvider().getEdgeSPARQL(e).toString();
 			query = "DELETE DATA { " + query + " }";
 			Update up = getCon().prepareUpdate(
 					org.openrdf.query.QueryLanguage.SPARQL, query);
@@ -137,7 +143,7 @@ public abstract class DataProvider {
 	 */
 	public void delete(final Model delete) throws OpenRDFException, IOException {
 		// connect();
-		String query = impl.getProvProvider().getSPARQLProvider().getGraphSPARQL(impl.getProvProvider().getRDFProvider().getModelGraph(delete), false).toString();
+		String query = impl.getSPARQLProvider().getGraphSPARQL(impl.getRDFProvider().getModelGraph(delete), false).toString();
 		Update up = getCon().prepareUpdate(org.openrdf.query.QueryLanguage.SPARQL, query);
 		up.execute();
 	}
@@ -419,7 +425,7 @@ public abstract class DataProvider {
 	 * @return
 	 */
 	public int insertNode(final Node n) {
-		Model m = impl.getProvProvider().getRDFProvider().getNodeModel(n);
+		Model m = impl.getRDFProvider().getNodeModel(n);
 		try {
 			write(m);
 		} catch (Exception e) {
@@ -438,7 +444,7 @@ public abstract class DataProvider {
 	 * @return
 	 */
 	public int insertEdge(final Edge e) {
-		Model m = impl.getProvProvider().getRDFProvider().getEdgeModel(e);
+		Model m = impl.getRDFProvider().getEdgeModel(e);
 		try {
 			write(m);
 		} catch (Exception ex) {
@@ -456,7 +462,7 @@ public abstract class DataProvider {
 	 * @return
 	 */
 	public int insertGraph(final Graph g) {
-		Model m = impl.getProvProvider().getRDFProvider().getGraphModel(g);
+		Model m = impl.getRDFProvider().getGraphModel(g);
 		try {
 			write(m);
 		} catch (Exception ex) {
@@ -486,6 +492,24 @@ public abstract class DataProvider {
 		return executeSparqlQuery(qry);
 	}
 
+	/**
+	 * Gets the subject's property from RDF repository.
+	 * 
+	 * @param subject
+	 * @param property
+	 * @return
+	 * @throws RepositoryException
+	 * @throws MalformedQueryException
+	 * @throws QueryEvaluationException
+	 */
+	protected String getPropertyTo(final String subject, final String property)
+			throws RepositoryException, MalformedQueryException,
+			QueryEvaluationException {
+		StringBuffer qry = new StringBuffer(1024);
+		qry.append("SELECT ?y where { ?y <" + property
+				+ "> <" + subject + ">. } ");
+		return executeSparqlQuery(qry);
+	}
 	/**
 	 * Gets list of subject's properties from RDF repository.
 	 * 
@@ -528,17 +552,32 @@ public abstract class DataProvider {
 			throws RepositoryException, QueryEvaluationException,
 			MalformedQueryException {
 		List<String> resource = new ArrayList<String>();
+		//Results from the repository.
 		String query = qry.toString();
 		// connect();
-		TupleQuery output = getCon().prepareTupleQuery(QueryLanguage.SPARQL,
-				query);
-		TupleQueryResult result = output.evaluate();
-		while (result.hasNext()) {
-			BindingSet bindingSet = result.next();
-			Value value = bindingSet.getValue("y");
-			resource.add(value.stringValue());
+		if(getCon() != null){
+			TupleQuery output = getCon().prepareTupleQuery(QueryLanguage.SPARQL,query);
+			TupleQueryResult result = output.evaluate();
+			while (result.hasNext()) {
+				BindingSet bindingSet = result.next();
+				Value value = bindingSet.getValue("y");
+				resource.add(value.stringValue());
+			}
+			result.close();
 		}
-		result.close();
+
+		//Results from the ontologies.
+		Query queryOb = QueryFactory.create(query);
+		// Execute the query and obtain results
+		QueryExecution qe = QueryExecutionFactory.create(queryOb, ontologies);
+		ResultSet jenaResults = qe.execSelect();
+		QuerySolution bindingSet = null;
+		while(jenaResults.hasNext()){
+			bindingSet = jenaResults.next() ;
+			Object res = bindingSet.get("y");
+			if(res != null)
+				resource.add(res.toString());
+		}
 		// disconnect();
 		return resource;
 	}
@@ -558,15 +597,33 @@ public abstract class DataProvider {
 		String resource = null;
 		String query = qry.toString();
 		// connect();
-		TupleQuery output = getCon().prepareTupleQuery(QueryLanguage.SPARQL,
-				query);
-		TupleQueryResult result = output.evaluate();
-		while (result.hasNext()) {
-			BindingSet bindingSet = result.next();
-			Value value = bindingSet.getValue("y");
-			resource = value.stringValue();
+		if(getCon() != null){
+			TupleQuery output = getCon().prepareTupleQuery(QueryLanguage.SPARQL,
+					query);
+			TupleQueryResult result = output.evaluate();
+			while (result.hasNext()) {
+				BindingSet bindingSet = result.next();
+				Value value = bindingSet.getValue("y");
+				resource = value.stringValue();
+			}
+			result.close();
 		}
-		result.close();
+		if(resource == null){
+
+			//Results from the ontologies.
+			Query queryOb = QueryFactory.create(query);
+			// Execute the query and obtain results
+			QueryExecution qe = QueryExecutionFactory.create(queryOb, ontologies);
+			ResultSet jenaResults = qe.execSelect();
+			QuerySolution bindingSet = null;
+			
+			while( jenaResults.hasNext()){
+				bindingSet = jenaResults.next() ;
+				Object res = bindingSet.get("y");
+				if(res != null)
+					resource = (res.toString());
+			}
+		}
 		// disconnect();
 		return resource;
 	}

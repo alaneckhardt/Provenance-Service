@@ -241,7 +241,7 @@ public class ProvenanceService extends javax.servlet.http.HttpServlet implements
 				String session = request.getParameter("session");
 				session = URLDecoder.decode(session, "UTF-8");
 				Graph g = impl.getGraph(session);
-				output = impl.getProvProvider().getSPARQLProvider().getGraphSPARQL(g, true).toString();
+				output = impl.getSPARQLProvider().getGraphSPARQL(g, true).toString();
 			} else if ("getProvenance".equals(action)) {
 				String resource = request.getParameter("resource");
 				String session = request.getParameter("session");
@@ -293,7 +293,7 @@ public class ProvenanceService extends javax.servlet.http.HttpServlet implements
 	 * @return JSON String
 	 */
 	public static String graphToJSONString(final Graph g) {
-		JSONArray ar = impl.getProvProvider().getJSONProvider().getGraphJSON(g);
+		JSONArray ar = impl.getJSONProvider().getGraphJSON(g);
 		if (ar == null)
 			return null;
 		return ar.toString();

@@ -6,7 +6,7 @@ import junit.framework.TestSuite;
 import provenanceService.Edge;
 import provenanceService.Node;
 import provenanceService.Properties;
-import provenanceService.RDFProvider;
+import provenanceService.provenanceModel.RDFProvider;
 
 
 public class TestRDFProvider extends TestCase {   

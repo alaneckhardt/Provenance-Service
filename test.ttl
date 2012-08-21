@@ -1,0 +1,41 @@
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix owl:     <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix time:    <http://www.w3.org/2006/time#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix foaf:    <http://xmlns.com/foaf/0.1/> .
+@prefix prov:    <http://www.w3.org/ns/prov-o#> .
+@prefix io:    <http://www.w3.org/ns/test/> .
+@prefix :        <#> .
+
+:a
+   a prov:Activity;
+
+  prov:used :input;
+  prov:qualifiedUsage [
+     a prov:Usage;
+     prov:qualifiedEntity   :input;
+     prov:hadRole         io:input;
+  ];
+
+  prov:used :parameters;
+  prov:qualifiedUsage [
+     a prov:Usage;
+     prov:qualifiedEntity   :parameters;
+     prov:hadRole         io:parameters;
+  ];
+
+  prov:generated :output;
+  prov:qualifiedGeneration [
+     a prov:Generation;
+     prov:qualifiedEntity   :output;
+     prov:hadRole         io:output;
+  ];
+
+  prov:generated :metadata;
+  prov:qualifiedGeneration [
+     a prov:Generation;
+     prov:qualifiedEntity   :metadata;
+     prov:hadRole         io:metadata;
+  ];
+.

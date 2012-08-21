@@ -11,13 +11,13 @@ import junit.framework.TestSuite;
 import provenanceService.DataProvider;
 import provenanceService.Edge;
 import provenanceService.Graph;
-import provenanceService.OPMJSONProvider;
 import provenanceService.Node;
 import provenanceService.Properties;
 import provenanceService.ProvenanceService;
 import provenanceService.ProvenanceServiceImpl;
-import provenanceService.RDFProvider;
 import provenanceService.Utility;
+import provenanceService.provenanceModel.OPMJSONProvider;
+import provenanceService.provenanceModel.RDFProvider;
 
 
 public class AllTests extends TestCase {   
@@ -34,10 +34,12 @@ public class AllTests extends TestCase {
 
 		impl.initProvenance();
 		TestSuite suite = new TestSuite();		
-		suite.addTest(TestSPARQLProvider.suite());   
+		
+		suite.addTest(TestFileAccess.suite());   
+		/*suite.addTest(TestSPARQLProvider.suite());   
 		suite.addTest(TestRDFProvider.suite());
 		suite.addTest(TestJSONProvider.suite());
-		suite.addTest(TestProvenanceService.suite());
+		suite.addTest(TestProvenanceService.suite());*/
 		return suite;
 	}	
 	public static Node getTestNode(int i, String type){

@@ -1,4 +1,8 @@
-package provenanceService;
+package provenanceService.provenanceModel;
+
+import provenanceService.Edge;
+import provenanceService.Node;
+import provenanceService.Properties;
 
 import com.hp.hpl.jena.vocabulary.RDF;
 

@@ -1,22 +1,37 @@
-package provenanceService;
+package provenanceService.provenanceModel;
 
 import org.openrdf.OpenRDFException;
 
+import provenanceService.Edge;
+import provenanceService.Graph;
+import provenanceService.Node;
+import provenanceService.Properties;
+import provenanceService.ProvenanceService;
+import provenanceService.Utility;
+
 import com.hp.hpl.jena.iri.IRI;
 import com.hp.hpl.jena.iri.IRIFactory;
+import com.hp.hpl.jena.query.Query;
+import com.hp.hpl.jena.query.QueryExecution;
+import com.hp.hpl.jena.query.QueryExecutionFactory;
+import com.hp.hpl.jena.query.QueryFactory;
+import com.hp.hpl.jena.query.QuerySolution;
+import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.ResIterator;
 import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.Statement;
+import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.vocabulary.RDF;
 
 /** Class providing functions for manipulation with RDF. Conversions between
  * Graph and RDF and querying the underlying RDF repository as well.
  *
  * @author AE */
-public final class OPMRDFProvider extends RDFProvider {
+public final class PROVORDFProvider extends RDFProvider {
 
 	/** Return Node from given Resource.
 	 *
@@ -66,24 +81,45 @@ public final class OPMRDFProvider extends RDFProvider {
 			return null;
 		if (!Utility.isURI(edge.getURI()))
 			return null;
-		if (edge.getProperty(Utility.getProp("from")) == null || edge.getProperty(Utility.getProp("to")) == null) {
-			return null;
-		}
 		Edge e = new Edge(edge.getURI());
-		Statement t = edge.getProperty(RDF.type);
-		if (t != null)
+		StmtIterator it = edge.listProperties(RDF.type);
+		String fromEdge = "";
+		String toEdge = "";
+		while(it.hasNext()){
+			Statement t = it.next();
 			e.setType(t.getObject().toString());
+			fromEdge = PROVOModel.getFromEdge(e.getType());
+			toEdge = PROVOModel.getToEdge(e.getType());
+			if(!fromEdge.isEmpty() && !toEdge.isEmpty())
+				break;
+		}
 
-		if (g != null)
-			e.setFrom(g.getNode(edge.getProperty(Utility.getProp("from")).getResource().getURI()));
-		if (e.getFrom() == null) {
-			e.setFrom(getNode(g, edge.getProperty(Utility.getProp("from")).getResource()));
+		if(fromEdge.isEmpty() || toEdge.isEmpty())
+			return null;
+
+		//Results from the ontologies.
+		Query queryOb = QueryFactory.create("SELECT ?x WHERE {?x <"+fromEdge+"> <"+edge.getURI()+">.}");
+		// Execute the query and obtain results
+		QueryExecution qe = QueryExecutionFactory.create(queryOb, ontologies);
+		ResultSet jenaResults = qe.execSelect();
+		QuerySolution bindingSet = null;
+		String subject = "";
+		if(jenaResults.hasNext()){
+			bindingSet = jenaResults.next() ;
+			Object res = bindingSet.get("x");
+			subject = res.toString();
 		}
 
 		if (g != null)
-			e.setTo(g.getNode(edge.getProperty(Utility.getProp("to")).getResource().getURI()));
+			e.setFrom(g.getNode(subject));
+		if (e.getFrom() == null) {
+			e.setFrom(getNode(g, edge.getModel().getResource(subject)));
+		}
+
+		if (g != null)
+			e.setTo(g.getNode(edge.getProperty(ResourceFactory.createProperty(toEdge)).getResource().getURI()));
 		if (e.getTo() == null) {
-			e.setTo(getNode(g, edge.getProperty(Utility.getProp("to")).getResource()));
+			e.setTo(getNode(g, edge.getProperty(ResourceFactory.createProperty(toEdge)).getResource()));
 		}
 
 		// Add the edge only if everything's all right
@@ -134,13 +170,15 @@ public final class OPMRDFProvider extends RDFProvider {
 				m.add(n1, RDF.type, m.createResource(e.getFrom().getType()));
 			if (e.getFrom().getTitle() != null)
 				m.add(n1, Utility.getProp("title"), e.getFrom().getTitle());
-			m.add(edge, Utility.getProp("from"), n1);
+			String fromEdge = PROVOModel.getFromEdge(e.getType());
+			m.add(edge, ResourceFactory.createProperty(fromEdge), n1);
 
 			if (e.getTo().getType() != null)
 				m.add(n2, RDF.type, m.createResource(e.getTo().getType()));
 			if (e.getTo().getTitle() != null)
 				m.add(n2, Utility.getProp("title"), e.getTo().getTitle());
-			m.add(edge, Utility.getProp("to"), n2);
+			String toEdge = PROVOModel.getToEdge(e.getType());
+			m.add(edge, ResourceFactory.createProperty(toEdge), n2);
 		}
 		return m;
 	}
@@ -156,10 +194,12 @@ public final class OPMRDFProvider extends RDFProvider {
 		Resource edge = m.createResource(e.getId());
 		m.add(edge, RDF.type, m.createResource(e.getType()));
 		Resource n1 = m.createResource(e.getFrom().getId());
-		m.add(edge, Utility.getProp("from"), n1);
+		String fromEdge = PROVOModel.getFromEdge(e.getType());
+		m.add(edge, ResourceFactory.createProperty(fromEdge), n1);
 
 		Resource n2 = m.createResource(e.getTo().getId());
-		m.add(edge, Utility.getProp("to"), n2);
+		String toEdge = PROVOModel.getToEdge(e.getType());
+		m.add(edge, ResourceFactory.createProperty(toEdge), n2);
 		return m;
 	}
 

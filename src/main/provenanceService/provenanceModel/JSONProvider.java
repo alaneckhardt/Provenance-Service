@@ -1,4 +1,4 @@
-package provenanceService;
+package provenanceService.provenanceModel;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -6,6 +6,10 @@ import net.sf.json.JSONObject;
 import org.openrdf.query.MalformedQueryException;
 import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.repository.RepositoryException;
+
+import provenanceService.Edge;
+import provenanceService.Graph;
+import provenanceService.Node;
 
 
 /**

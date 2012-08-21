@@ -1,6 +1,11 @@
-package provenanceService;
+package provenanceService.provenanceModel;
 
 import java.util.ArrayList;
+
+import provenanceService.Edge;
+import provenanceService.Graph;
+import provenanceService.Node;
+import provenanceService.Utility;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;

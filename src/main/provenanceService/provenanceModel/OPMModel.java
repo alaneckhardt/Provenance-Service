@@ -1,19 +1,25 @@
-package provenanceService;
+package provenanceService.provenanceModel;
 
+import java.util.ArrayList;
 import java.util.UUID;
+
+import provenanceService.ProvenanceServiceException;
+import provenanceService.ProvenanceServiceImpl;
+import provenanceService.Utility;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.vocabulary.RDF;
 
 
-public class PROVOModel extends ProvenanceModel{
-	public PROVOModel(ProvenanceServiceImpl psi) {
+public class OPMModel extends ProvenanceModel{
+	public OPMModel(ProvenanceServiceImpl psi){
 		super(psi);
+		JSONProvider = new OPMJSONProvider();
+		RDFProvider = new OPMRDFProvider();
+		SPARQLProvider = new OPMSPARQLProvider();
+		dataProvider = new OPMDataProvider();
 	}
-
-	ProvenanceServiceImpl psi;
-
 	/** Adds relationship to the process. Causal relationships are e.g.
 	 * controlledBy, Used, wasGeneratedBy,...
 	 *
@@ -48,11 +54,12 @@ public class PROVOModel extends ProvenanceModel{
 	 * @param sessionId Id of the session.
 	 * @return URI of the new resource.
 	 * @throws ProvenanceServiceException */
-	public String addNode(final Model model, final String type) throws ProvenanceServiceException{
+	public String addNode(Model model, final String type) throws ProvenanceServiceException{
 		String instanceId = psi.getNewURI();
 		Resource res = model.createResource(instanceId);
 		model.createResource(type);
 		model.add(res, RDF.type, model.createResource(type));
 		return res.getURI();
+
 	}
 }
