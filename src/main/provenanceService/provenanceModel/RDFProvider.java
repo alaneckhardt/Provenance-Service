@@ -5,8 +5,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
 
-import org.openrdf.OpenRDFException;
-
 import provenanceService.Edge;
 import provenanceService.Graph;
 import provenanceService.Node;
@@ -113,9 +111,9 @@ public abstract class RDFProvider {
 	/** Loads the custom properties from the RDF repository.
 	 *
 	 * @param n Node. Shouldn't be null.
-	 * @param res RDF resource containing the custom properties for the node..
-	 * @throws OpenRDFException ex*/
-	public void loadCustomProperties(final Node n,final Resource res) throws OpenRDFException {
+	 * @param res RDF resource containing the custom properties for the node.
+	 */
+	public void loadCustomProperties(final Node n,final Resource res)  {
 		for (String prop : customProperties) {
 			String val = null;
 			Statement t = res.getProperty(res.getModel().getProperty(prop));

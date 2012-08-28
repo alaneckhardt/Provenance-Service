@@ -1,7 +1,5 @@
 package provenanceService.provenanceModel;
 
-import org.openrdf.OpenRDFException;
-
 import provenanceService.Edge;
 import provenanceService.Graph;
 import provenanceService.Node;
@@ -62,12 +60,7 @@ public final class PROVORDFProvider extends RDFProvider {
 			node.setType(t.getObject().toString());
 			node.setBasicType(ProvenanceService.getSingleton().getShape(node.getType()));
 		}
-		try {
-			loadCustomProperties(node, res);
-		} catch (OpenRDFException e) {
-			// This shoudln't happen at all.
-			e.printStackTrace();
-		}
+		loadCustomProperties(node, res);
 		return node;
 	}
 

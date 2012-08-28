@@ -28,8 +28,6 @@ public class TestRDFProvider extends TestCase {
 	
 	public void testConnection() {
 		try {
-			AllTests.impl.getProvProvider().getDataProvider().connect();
-			AllTests.impl.getProvProvider().getDataProvider().disconnect();
 		} catch (Exception e) {
 			fail(e.getLocalizedMessage());
 		}
@@ -78,7 +76,6 @@ public class TestRDFProvider extends TestCase {
 	}
 	public void testDelete() {
 		Node nControl;
-		try {
 			Node n = AllTests.getTestNode(1, "http://www.policygrid.org/ourspacesVRE.owl#UploadResource");
 			Node n2 = AllTests.getTestNode(2, "http://www.policygrid.org/ourspacesVRE.owl#UploadResource");
 			Edge e = AllTests.getTestEdge(3,n,n2, "http://www.policygrid.org/ourspacesVRE.owl#UploadResource");
@@ -91,10 +88,7 @@ public class TestRDFProvider extends TestCase {
 			assertTrue(nControl == null || nControl.getType() == null);
 			Edge nControlE = AllTests.impl.getProvProvider().getDataProvider().getEdge(null, "http://openprovenance.org/ontology#Edge1");
 			assertTrue(nControlE == null || nControlE.getType() == null);
-		} catch (org.openrdf.OpenRDFException e) {
-			e.printStackTrace();
-			fail(e.getLocalizedMessage());
-		}		
+		
 	}
 	
 }

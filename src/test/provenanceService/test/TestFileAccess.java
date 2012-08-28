@@ -3,23 +3,17 @@ package provenanceService.test;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 
-import org.openrdf.OpenRDFException;
-
-import com.hp.hpl.jena.ontology.OntModel;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
-
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
-import provenanceService.DataProvider;
-import provenanceService.Edge;
 import provenanceService.Graph;
-import provenanceService.Node;
 import provenanceService.Properties;
 import provenanceService.ProvenanceServiceImpl;
-import provenanceService.provenanceModel.OPMDataProvider;
+import provenanceService.provenanceModel.DataProvider;
 import provenanceService.provenanceModel.PROVODataProvider;
-import provenanceService.provenanceModel.SPARQLProvider;
+
+import com.hp.hpl.jena.ontology.OntModel;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
 
 
 public class TestFileAccess extends TestCase {   
@@ -71,9 +65,6 @@ public class TestFileAccess extends TestCase {
 			Graph g = ps.getProvenance("http://www.policygrid.org/provenance-generic.owl#Ent2", provSession);
 			int a = 1;
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (OpenRDFException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

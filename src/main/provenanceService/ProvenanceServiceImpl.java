@@ -3,7 +3,6 @@ package provenanceService;
 import java.io.IOException;
 import java.io.StringReader;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -13,9 +12,7 @@ import java.util.Vector;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONSerializer;
-
-import org.openrdf.OpenRDFException;
-
+import provenanceService.provenanceModel.DataProvider;
 import provenanceService.provenanceModel.JSONProvider;
 import provenanceService.provenanceModel.ProvenanceModel;
 import provenanceService.provenanceModel.RDFProvider;
@@ -30,6 +27,7 @@ import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.vocabulary.OWL;
 import com.hp.hpl.jena.vocabulary.RDF;
 
+// TODO: Auto-generated Javadoc
 /** Provenance service can stored the given provenance data in the database. The
  * primary interface is JSON object of this structure:<br>
  *
@@ -86,8 +84,6 @@ import com.hp.hpl.jena.vocabulary.RDF;
  * @author AE
  * @version 1.0 */
 public class ProvenanceServiceImpl {
-	/** serial version UID. */
-	private static final long serialVersionUID = 51177771345689726L;
 	/** Index of last session. */
 	private int lastSession = 0;
 
@@ -125,11 +121,11 @@ public class ProvenanceServiceImpl {
 		namespace = Properties.getString("namespace");
         try {
     		//provProvider = Class.forName(Properties.getString("ProvenanceModel"));
-            Class cls = Class.forName(Properties.getString("ProvenanceModel"));
-           Class partypes[] = new Class[1];
+            Class<?> cls = Class.forName(Properties.getString("ProvenanceModel"));
+            Class<?>[] partypes = new Class[1];
             partypes[0] = ProvenanceServiceImpl.class;
-            Constructor ct = cls.getConstructor(partypes);
-            Object arglist[] = new Object[1];
+            Constructor<?> ct = cls.getConstructor(partypes);
+            Object[] arglist = new Object[1];
             arglist[0] = this;
 			provProvider = (ProvenanceModel) ct.newInstance(arglist);
 			getRDFProvider().init();
@@ -193,22 +189,32 @@ public class ProvenanceServiceImpl {
 		}
 	}
 
-	/** Returns the shape for given type.
+	/**
+	 * Returns the shape for given type.
 	 *
 	 * @param type Type of the resource.
-	 * @return */
+	 * @return the shape
+	 */
 	public String getShape(final String type) {
 		return getBasicTypes().get(type);
 	}
 
-	/** @return All the processes in the map. */
+	/**
+	 * Gets the sessions.
+	 *
+	 * @return All the processes in the map.
+	 */
 	public String[] getSessions() {
 		String[] keys = new String[sessions.keySet().size()];
 		keys = sessions.keySet().toArray(keys);
 		return keys;
 	}
 
-	/** @return The map of processes. */
+	/**
+	 * Gets the sessions map.
+	 *
+	 * @return The map of processes.
+	 */
 	public Map<String, Model> getSessionsMap() {
 		return sessions;
 	}
@@ -235,13 +241,15 @@ public class ProvenanceServiceImpl {
 		return id;
 	}
 
-	/** Adds a custom property to the given resource.
+	/**
+	 * Adds a custom property to the given resource.
 	 *
 	 * @param sessionId Id of the session.
 	 * @param node Subject
 	 * @param property Property
 	 * @param value Value
-	 * @throws ProvenanceServiceException */
+	 * @throws ProvenanceServiceException the provenance service exception
+	 */
 	public void addCustomProperty(final String sessionId, final String node, final String property, final String value) throws ProvenanceServiceException {
 		Model model = sessions.get(sessionId);
 		if (model == null)
@@ -260,18 +268,24 @@ public class ProvenanceServiceImpl {
 			res.addProperty(p, model.createResource(value));
 
 	}
-	
+
+	/**
+	 * Gets the new uri.
+	 *
+	 * @return the new uri
+	 */
 	public String getNewURI(){
 		return namespace + UUID.randomUUID().toString();
 	}
 
-	/** Create an instance of given type.
+	/**
+	 * Create an instance of given type.
 	 *
-	 * @param type
-	 *            Type of the node
 	 * @param sessionId Id of the session.
+	 * @param type Type of the node
 	 * @return URI of the new resource.
-	 * @throws ProvenanceServiceException */
+	 * @throws ProvenanceServiceException the provenance service exception
+	 */
 	public String addNode(final String sessionId, final String type) throws ProvenanceServiceException {
 		Model model = sessions.get(sessionId);
 		if (model == null)
@@ -279,46 +293,51 @@ public class ProvenanceServiceImpl {
 		return provProvider.addNode(model, type);
 	}
 
-	/** Starts the process of creating provenance. Return rdfId of the new
+	/**
+	 * Starts the process of creating provenance. Return rdfId of the new
 	 * process.
 	 *
 	 * @param sessionId Id of the session.
 	 * @return URI of the new process.
-	 * @throws ProvenanceServiceException */
+	 * @throws ProvenanceServiceException the provenance service exception
+	 */
 	public String addProcess(final String sessionId) throws ProvenanceServiceException {
 		return addNode(sessionId, Properties.getString("process"));
 	}
 
-	/** Adds an agent to the provenance graph. It should be linked to the process
+	/**
+	 * Adds an agent to the provenance graph. It should be linked to the process
 	 * later.
 	 *
 	 * @param sessionId Id of the session.
 	 * @return URI of the new artifact.
-	 * @throws ProvenanceServiceException */
+	 * @throws ProvenanceServiceException the provenance service exception
+	 */
 	public String addAgent(final String sessionId) throws ProvenanceServiceException {
 		return addNode(sessionId, Properties.getString("agent"));
 	}
 
-	/** Adds an artefact to the provenance graph. It should be linked to the
+	/**
+	 * Adds an artefact to the provenance graph. It should be linked to the
 	 * process later.
 	 *
 	 * @param sessionId Id of the session.
 	 * @return URI of the new artifact.
-	 * @throws ProvenanceServiceException */
+	 * @throws ProvenanceServiceException the provenance service exception
+	 */
 	public String addArtifact(final String sessionId) throws ProvenanceServiceException {
 		return addNode(sessionId, Properties.getString("artifact"));
 	}
 
-	/** Adds title to the given object.
+	/**
+	 * Adds title to the given object.
 	 *
 	 * @param sessionId Id of the session.
-	 * @param object
-	 *            Object to receive the title
-	 * @param title
-	 *            Title.
-	 * @throws ProvenanceServiceException */
+	 * @param object Object to receive the title
+	 * @param title Title.
+	 * @throws ProvenanceServiceException the provenance service exception
+	 */
 	public void addTitle(final String sessionId, final String object, final String title) throws ProvenanceServiceException {
-		// System.out.println(sessionId+","+object+","+title);
 		Model model = sessions.get(sessionId);
 		if (model == null)
 			throw new ProvenanceServiceException("Error - no session " + sessionId);
@@ -331,10 +350,11 @@ public class ProvenanceServiceImpl {
 		model.add(res, p, title);
 	}
 
-	/** Adds whole provenance graph to the given session.
+	/**
+	 * Adds whole provenance graph to the given session.
 	 *
-	 * @param jsonGraph JSON string to be inserted.
 	 * @param sessionId Id of the session.
+	 * @param jsonGraph JSON string to be inserted.
 	 */
 	public void addJSONGraph(final String sessionId, final String jsonGraph) {
 		JSONArray nodes = (JSONArray) JSONSerializer.toJSON(jsonGraph);
@@ -342,7 +362,10 @@ public class ProvenanceServiceImpl {
 		Graph g = getJSONProvider().getGraph(nodes);
 		sessions.get(sessionId).add(getRDFProvider().getGraphModel(g));
 	}
+
 	/**
+	 * Adds the rdf graph.
+	 *
 	 * @param sessionId Id of the session.
 	 * @param input Model to be inserted.
 	 */
@@ -350,7 +373,10 @@ public class ProvenanceServiceImpl {
 		Model model = sessions.get(sessionId);
 		model.add(input);
 	}
+
 	/**
+	 * Adds the rdf graph.
+	 *
 	 * @param sessionId Id of the session.
 	 * @param input String of RDF data to be inserted.
 	 */
@@ -359,21 +385,20 @@ public class ProvenanceServiceImpl {
 		model.read(new StringReader(input), null);
 	}
 
-	/** Adds relationship to the process. Causal relationships are e.g.
+	/**
+	 * Adds relationship to the process. Causal relationships are e.g.
 	 * controlledBy, Used, wasGeneratedBy,...
 	 *
 	 * @param sessionId Id of the session.
-	 *            URI of the process to be the relation added to.
-	 * @param type
-	 *            The type of the causal relationship.
-	 * @param from
-	 *            The subject of the relationship - this can be artifact, agent,
-	 *            or other process.
-	 * @param to
-	 *            The object of the relationship - this can be artifact, agent,
-	 *            or other process.
+	 * URI of the process to be the relation added to.
+	 * @param type The type of the causal relationship.
+	 * @param from The subject of the relationship - this can be artifact, agent,
+	 * or other process.
+	 * @param to The object of the relationship - this can be artifact, agent,
+	 * or other process.
 	 * @return URI of the new relationship.
-	 * @throws ProvenanceServiceException */
+	 * @throws ProvenanceServiceException the provenance service exception
+	 */
 	public String addCausalRelationship(final String sessionId, final String type, final String from, final String to) throws ProvenanceServiceException {
 		Model model = sessions.get(sessionId);
 
@@ -383,12 +408,17 @@ public class ProvenanceServiceImpl {
 	}
 
 	/**
+	 * Gets the data provider.
+	 *
 	 * @return dataprovider.
 	 */
 	public DataProvider getDataProvider() {
 		return provProvider.getDataProvider();
 	}
+
 	/**
+	 * Gets the rDF provider.
+	 *
 	 * @return RDFprovider.
 	 */
 	public RDFProvider getRDFProvider() {
@@ -396,54 +426,55 @@ public class ProvenanceServiceImpl {
 	}
 
 	/**
+	 * Gets the jSON provider.
+	 *
 	 * @return JSONprovider.
 	 */
 	public JSONProvider getJSONProvider() {
 		return provProvider.getJSONProvider();
 	}
+
 	/**
+	 * Gets the sPARQL provider.
+	 *
 	 * @return SPARQLprovider.
 	 */
 	public SPARQLProvider getSPARQLProvider() {
 		return provProvider.getSPARQLProvider();
 	}
-	
-	
+
+
 	/**
+	 * Sets the data provider.
+	 *
 	 * @param dataProvider Dataprovider to use.
 	 */
 	public void setDataProvider(final DataProvider dataProvider) {
 		provProvider.setDataProvider(dataProvider);
 	}
 
-	/** Adds an existing resource from the RDF store to the session graph.
+	/**
+	 * Adds an existing resource from the RDF store to the session graph.
 	 *
 	 * @param sessionId Id of the session.
 	 * @param uri URI of the resource
-	 * @return
-	 * @throws ProvenanceServiceException ex */
+	 * @throws ProvenanceServiceException ex
+	 */
 	public void addExistingResource(final String sessionId, final String uri) throws ProvenanceServiceException {
 		Node n;
-		try {
 			n = getDataProvider().getNode(null, uri);
 			addExistingResource(sessionId, uri, n.getType(), n.getTitle());
-		} catch (org.openrdf.OpenRDFException e) {
-			e.printStackTrace();
-			throw new ProvenanceServiceException(e);
-		}
 	}
 
-	/** Adds an existing resource from the RDF store to the session graph.
+	/**
+	 * Adds an existing resource from the RDF store to the session graph.
 	 *
 	 * @param sessionId Id of the session.
-	 * @param uri
-	 *            URI of the resource
-	 * @param type
-	 *            Type of the resource
-	 * @param title
-	 *            Title of the resource - for the visualisation purpose.
-	 * @return
-	 * @throws ProvenanceServiceException */
+	 * @param uri URI of the resource
+	 * @param type Type of the resource
+	 * @param title Title of the resource - for the visualisation purpose.
+	 * @throws ProvenanceServiceException the provenance service exception
+	 */
 	public void addExistingResource(final String sessionId, final String uri, final String type, final String title) throws ProvenanceServiceException {
 		Model model = sessions.get(sessionId);
 		if (model == null)
@@ -453,11 +484,13 @@ public class ProvenanceServiceImpl {
 			addTitle(sessionId, uri, title);
 	}
 
-	/** Returns the JSON representation of the Graph associated with the given
+	/**
+	 * Returns the JSON representation of the Graph associated with the given
 	 * sessionId.
 	 *
 	 * @param sessionId Id of the session.
-	 * @return */
+	 * @return the jSON graph
+	 */
 	public JSONArray getJSONGraph(final String sessionId) {
 		Graph g = getGraph(sessionId);
 		return getJSONProvider().getGraphJSON(g);
@@ -489,10 +522,12 @@ public class ProvenanceServiceImpl {
 
 	}
 
-	/** Returns the RDF model associated with the given sessionId.
+	/**
+	 * Returns the RDF model associated with the given sessionId.
 	 *
 	 * @param sessionId Id of the session.
-	 * @return */
+	 * @return the model
+	 */
 	public Model getModel(final String sessionId) {
 		return sessions.get(sessionId);
 	}
@@ -513,20 +548,26 @@ public class ProvenanceServiceImpl {
 			if (sessionsDelete.get(sessionId) == null)
 				sessionsDelete.put(sessionId,  ModelFactory.createDefaultModel());
 			Edge e;
-			try {
 				e = getDataProvider().getEdge(null, relationship);
 				sessionsDelete.get(sessionId).add(getRDFProvider().getEdgeModel(e));
-			} catch (OpenRDFException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
 		}
 	}
 
+	/**
+	 * Gets the prov provider.
+	 *
+	 * @return the prov provider
+	 */
 	public ProvenanceModel getProvProvider() {
 		return provProvider;
 	}
-	public void setProvProvider(ProvenanceModel provProvider) {
+
+	/**
+	 * Sets the prov provider.
+	 *
+	 * @param provProvider the new prov provider
+	 */
+	public void setProvProvider(final ProvenanceModel provProvider) {
 		this.provProvider = provProvider;
 	}
 	/** Removes the given node from the model.
@@ -543,21 +584,17 @@ public class ProvenanceServiceImpl {
 			if (sessionsDelete.get(sessionId) == null)
 				sessionsDelete.put(sessionId, ModelFactory.createDefaultModel());
 			Node n;
-			try {
 				n = getDataProvider().getNode(null, node);
 				sessionsDelete.get(sessionId).add(getRDFProvider().getNodeModel(n));
-			} catch (OpenRDFException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
 		}
 	}
 
-	/** Cleans the RDF model, leaving only the provenance stuff in the model.
+	/**
+	 * Cleans the RDF model, leaving only the provenance stuff in the model.
 	 *
 	 * @param sessionId Id of the session.
-	 * @return
-	 * @throws ProvenanceServiceException */
+	 * @throws ProvenanceServiceException the provenance service exception
+	 */
 	public void clean(final String sessionId) throws ProvenanceServiceException {
 		try {
 			Model m = sessions.get(sessionId);
@@ -571,25 +608,20 @@ public class ProvenanceServiceImpl {
 	}
 
 	/**
+	 * Commit.
+	 *
 	 * @param sessionId Id of the session.
-	 * @throws IOException ex
-	 * @throws ProvenanceServiceException ex
-	 * @throws OpenRDFException ex
-	 *             When the RDF model of the given process is bad or does not
-	 *             satisfy policies. */
-	public void commit(final String sessionId) throws OpenRDFException, IOException, ProvenanceServiceException {
+	 * @throws ProvenanceServiceException When the RDF model of the given process is bad or does not
+	 * satisfy policies.
+	 */
+	public void commit(final String sessionId) throws ProvenanceServiceException {
 		Model m = sessions.get(sessionId);
 		if (m == null)
 			throw new ProvenanceServiceException("Error - no session " + sessionId);
-		try {
 			getDataProvider().write(m);
 			if (sessionsDelete.get(sessionId) != null) {
 				getDataProvider().delete(sessionsDelete.get(sessionId));
 			}
-		} catch (OpenRDFException e) {
-			e.printStackTrace();
-			throw new ProvenanceServiceException(e);
-		}
 		// All ok, discard the model.
 		m.close();
 		sessions.remove(sessionId);
@@ -605,15 +637,16 @@ public class ProvenanceServiceImpl {
 		// TODO perform rollback
 	}
 
-	/** Finds the provenance graph near the given resource.
+	/**
+	 * Finds the provenance graph near the given resource.
 	 * The edges to and from the resource are obtained. If a process is among
 	 * the neighoring nodes, then also its edges are obtained.
 	 *
-	 * @param sessionId Id of the session.
 	 * @param resource URI of the resource
+	 * @param sessionId Id of the session.
 	 * @return Provenance graph near the given resource.
-	 * @throws OpenRDFException */
-	public Graph getProvenance(final String resource, final String sessionId) throws OpenRDFException {
+	 */
+	public Graph getProvenance(final String resource, final String sessionId)  {
 		Graph prov = getImmediateProvenance(resource, sessionId);
 		Graph provAll = prov;
 		for (Node n : prov.getNodes()) {
@@ -635,9 +668,8 @@ public class ProvenanceServiceImpl {
 	 * @param resourceID URI of the resource
 	 * @param sessionId Id of the session.
 	 * @return Graph containing the given resource and all edges directing from
-	 *         it.
-	 * @throws OpenRDFException */
-	public Graph getProvenanceFrom(final String resourceID, final String sessionId) throws OpenRDFException {
+	 *         it. */
+	public Graph getProvenanceFrom(final String resourceID, final String sessionId)  {
 		Graph g = new Graph();
 		Graph g2 = new Graph();
 		if (sessions.containsKey(sessionId) && sessions.get(sessionId) != null)
@@ -653,9 +685,8 @@ public class ProvenanceServiceImpl {
 	 * @param resourceID URI of the resource
 	 * @param sessionId Id of the session.
 	 * @return Graph containing the given resource and all edges directing to
-	 *         it.
-	 * @throws OpenRDFException */
-	public Graph getProvenanceTo(final String resourceID, final String sessionId) throws OpenRDFException {
+	 *         it. */
+	public Graph getProvenanceTo(final String resourceID, final String sessionId)  {
 		Graph g = new Graph();
 		Graph g2 = new Graph();
 		if (sessions.containsKey(sessionId) && sessions.get(sessionId) != null)
@@ -666,14 +697,15 @@ public class ProvenanceServiceImpl {
 		return g;
 	}
 
-	/** Returns the graph immediately around the given resource. Data are
+	/**
+	 * Returns the graph immediately around the given resource. Data are
 	 * obtained from the underlying RDF repository.
 	 *
-	 * @param sessionId Id of the session.
 	 * @param resource URI of the resource, whose provenance will be loaded.
+	 * @param sessionId Id of the session.
 	 * @return only the edges to and from the given resource.
-	 * @throws OpenRDFException ex*/
-	public Graph getImmediateProvenance(final String resource, final String sessionId) throws OpenRDFException {
+	 */
+	public Graph getImmediateProvenance(final String resource, final String sessionId)  {
 		Graph l = getProvenanceTo(resource, sessionId);
 		l = l.merge(getProvenanceFrom(resource, sessionId));
 		for (int i = 0; i < l.size(); i++) {
@@ -692,38 +724,83 @@ public class ProvenanceServiceImpl {
 		return l;
 	}
 
+	/**
+	 * Gets the basic types.
+	 *
+	 * @return the basic types
+	 */
 	public Map<String, String> getBasicTypes() {
 		return basicTypes;
 	}
 
+	/**
+	 * Sets the basic types.
+	 *
+	 * @param basicTypes the basic types
+	 */
 	public void setBasicTypes(final Map<String, String> basicTypes) {
 		this.basicTypes = basicTypes;
 	}
 
+	/**
+	 * Sets the sessions.
+	 *
+	 * @param sessions the sessions
+	 */
 	public void setSessions(final Map<String, Model> sessions) {
 		this.sessions = sessions;
 	}
 
+	/**
+	 * Gets the namespace.
+	 *
+	 * @return the namespace
+	 */
 	public String getNamespace() {
 		return namespace;
 	}
 
+	/**
+	 * Sets the namespace.
+	 *
+	 * @param namespace the new namespace
+	 */
 	public void setNamespace(final String namespace) {
 		this.namespace = namespace;
 	}
 
+	/**
+	 * Gets the properties.
+	 *
+	 * @return the properties
+	 */
 	public List<String> getProperties() {
 		return properties;
 	}
 
+	/**
+	 * Sets the properties.
+	 *
+	 * @param properties the new properties
+	 */
 	public void setProperties(final List<String> properties) {
 		this.properties = properties;
 	}
 
+	/**
+	 * Gets the nodes.
+	 *
+	 * @return the nodes
+	 */
 	public List<String> getNodes() {
 		return nodes;
 	}
 
+	/**
+	 * Sets the nodes.
+	 *
+	 * @param nodes the new nodes
+	 */
 	public void setNodes(final List<String> nodes) {
 		this.nodes = nodes;
 	}

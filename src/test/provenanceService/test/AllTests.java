@@ -1,14 +1,8 @@
 package provenanceService.test;
 
-import org.openrdf.query.GraphQuery;
-import org.openrdf.query.GraphQueryResult;
-import org.openrdf.query.QueryLanguage;
-import org.openrdf.repository.RepositoryException;
-
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
-import provenanceService.DataProvider;
 import provenanceService.Edge;
 import provenanceService.Graph;
 import provenanceService.Node;
@@ -16,8 +10,6 @@ import provenanceService.Properties;
 import provenanceService.ProvenanceService;
 import provenanceService.ProvenanceServiceImpl;
 import provenanceService.Utility;
-import provenanceService.provenanceModel.OPMJSONProvider;
-import provenanceService.provenanceModel.RDFProvider;
 
 
 public class AllTests extends TestCase {   
@@ -51,12 +43,6 @@ public class AllTests extends TestCase {
 		}
 		int j = 0;
 		impl.getProvProvider().getDataProvider().init(impl);
-		try {
-			impl.getProvProvider().getDataProvider().connect();
-		} catch (RepositoryException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 		for(String prop : impl.getProvProvider().getDataProvider().getCustomProperties()){
 			n.addProperty(prop, "TestProp"+i*10+j);
 			j++;
@@ -85,7 +71,7 @@ public class AllTests extends TestCase {
 	public static void deleteTemporary(String subject) {
 		try {
 
-				StringBuffer qry = new StringBuffer(1024);
+			/*	StringBuffer qry = new StringBuffer(1024);
 				qry.append("construct { ");
 				qry.append("<"+subject+"> ?p ?o. } where { ");
 				qry.append("<"+subject+"> ?p ?o. } ");
@@ -96,7 +82,7 @@ public class AllTests extends TestCase {
 				GraphQueryResult result = q.evaluate();
 				impl.getProvProvider().getDataProvider().getCon().remove(result);
 				impl.getProvProvider().getDataProvider().getCon().commit();
-				impl.getProvProvider().getDataProvider().disconnect();
+				impl.getProvProvider().getDataProvider().disconnect();*/
 			} catch (Exception e) {
 			fail(e.getLocalizedMessage());			
 		}

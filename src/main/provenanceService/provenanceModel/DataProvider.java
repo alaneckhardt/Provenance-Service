@@ -1,30 +1,20 @@
-package provenanceService;
+package provenanceService.provenanceModel;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
-import org.openrdf.OpenRDFException;
-import org.openrdf.model.Value;
-import org.openrdf.query.BindingSet;
-import org.openrdf.query.MalformedQueryException;
-import org.openrdf.query.QueryEvaluationException;
-import org.openrdf.query.QueryLanguage;
-import org.openrdf.query.TupleQuery;
-import org.openrdf.query.TupleQueryResult;
-import org.openrdf.query.Update;
-import org.openrdf.repository.Repository;
-import org.openrdf.repository.RepositoryConnection;
-import org.openrdf.repository.RepositoryException;
-import org.openrdf.repository.http.HTTPRepository;
-import org.openrdf.rio.RDFFormat;
+import provenanceService.Edge;
+import provenanceService.Graph;
+import provenanceService.Node;
+import provenanceService.Properties;
+import provenanceService.ProvenanceService;
+import provenanceService.ProvenanceServiceImpl;
+import provenanceService.Utility;
 
 import com.hp.hpl.jena.ontology.OntClass;
 import com.hp.hpl.jena.ontology.OntModel;
@@ -37,13 +27,15 @@ import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.ResIterator;
+import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.shared.Lock;
+import com.hp.hpl.jena.update.UpdateExecutionFactory;
+import com.hp.hpl.jena.update.UpdateFactory;
+import com.hp.hpl.jena.update.UpdateProcessor;
+import com.hp.hpl.jena.update.UpdateRequest;
 import com.hp.hpl.jena.util.iterator.ExtendedIterator;
-import com.hp.hpl.jena.vocabulary.RDF;
-
 /**
  * Class providing functions for manipulation with RDF. Conversions between
  * Graph and RDF and querying the underlying RDF repository as well.
@@ -52,33 +44,37 @@ import com.hp.hpl.jena.vocabulary.RDF;
  *
  */
 public abstract class DataProvider {
-	/** Connection to the RDF Repository.*/
-	protected RepositoryConnection con;
 	/** All the ontologies loaded into one big model. */
 	protected OntModel ontologies;
 
 	/** List of custom properties to load. */
 	protected List<String> customProperties;
-	
+
+	/**URL of the SPARQL endpoint for querying.*/
+	protected String endpoint;
+	/**URL of the SPARQL endpoint to write the data to.*/
+	protected String endpointWrite;
+
+	/** The impl. */
 	protected ProvenanceServiceImpl impl;
+
 	/**
 	 * Initialises the connection to repository, loads  the ontologies.
+	 *
+	 * @param impl the impl
 	 */
 	@SuppressWarnings("unchecked")
-	public void init(ProvenanceServiceImpl impl) {
+	public void init(final ProvenanceServiceImpl impl) {
 		this.impl = impl;
 		if(this.impl == null)
 			this.impl = ProvenanceService.getSingleton();
 		System.setProperty("http.proxyHost", Properties.getString("proxyhost"));
 		System.setProperty("http.proxyPort", Properties.getString("proxyport"));
-		try {
-			connect();
-		} catch (RepositoryException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
+
 		// customProperties = new ArrayList<String>();
 		customProperties = Properties.getValues().getList("customProperties");
+		endpoint = Properties.getValues().getString("endpoint");
+		endpointWrite = Properties.getValues().getString("endpointWrite");
 
 		String path = Properties.getString("ontologiesDirectory");
 		path = Properties.getBaseFolder() + path;
@@ -87,8 +83,7 @@ public abstract class DataProvider {
 		 * String[] onts = d.list(new FilenameFilter() { public boolean
 		 * accept(File arg0, String name) { return name.endsWith(".owl"); } });
 		 */
-		List<String> ontologiesNames = Properties.getValues().getList(
-				"ontologies");
+		List<String> ontologiesNames = Properties.getValues().getList("ontologies");
 		ontologies = ModelFactory.createOntologyModel();
 		if (ontologiesNames != null) {
 			for (String s : ontologiesNames) {
@@ -113,11 +108,10 @@ public abstract class DataProvider {
 
 	/**
 	 * Deletes the list of uris from the repository.
+	 *
 	 * @param uris List of uris to be deleted.
-	 * @throws OpenRDFException
-	 * @throws IOException
 	 */
-	public void delete(final List<String> uris) throws OpenRDFException, IOException {
+	public void delete(final List<String> uris) {
 		// connect();
 		for (String s : uris) {
 			Node n = this.getNode(null, s);
@@ -128,9 +122,11 @@ public abstract class DataProvider {
 			else
 				query = impl.getSPARQLProvider().getEdgeSPARQL(e).toString();
 			query = "DELETE DATA { " + query + " }";
-			Update up = getCon().prepareUpdate(
-					org.openrdf.query.QueryLanguage.SPARQL, query);
-			up.execute();
+
+			//Send the SPARQL update to the server
+			UpdateRequest queryObj = UpdateFactory.create(query);
+			UpdateProcessor qexec = UpdateExecutionFactory.createRemote(queryObj, endpointWrite);
+			qexec.execute();
 		}
 		// disconnect();
 	}
@@ -138,30 +134,43 @@ public abstract class DataProvider {
 	/**
 	 * Deletes the given model from repository.
 	 * @param delete Model to be deleted.
-	 * @throws OpenRDFException
-	 * @throws IOException
 	 */
-	public void delete(final Model delete) throws OpenRDFException, IOException {
+	public void delete(final Model delete)  {
+		if(delete.size() == 0)
+			return;
 		// connect();
+/*
+        GraphStore gs=GraphStoreFactory.create(delete);
+        gs.setDefaultGraph(delete.getGraph());
+        UpdateRequest ur = UpdateFactory.create(query);
+        Update update = ur.getOperations().get(0);
+        UpdateExecutionFactory.createRemote(ur,"http://localhost:3030/per2.owl");
+        UpdateAction.execute(ur,gs);*/
+
 		String query = impl.getSPARQLProvider().getGraphSPARQL(impl.getRDFProvider().getModelGraph(delete), false).toString();
-		Update up = getCon().prepareUpdate(org.openrdf.query.QueryLanguage.SPARQL, query);
-		up.execute();
+		//Send the SPARQL update to the server
+		UpdateRequest queryObj = UpdateFactory.create(query);
+		UpdateProcessor qexec = UpdateExecutionFactory.createRemote(queryObj, endpointWrite);
+		qexec.execute();
 	}
 
 	/**
 	 * Writes the given model to the repository.
 	 * @param m Model to be written to the repository.
-	 * @throws OpenRDFException
-	 * @throws IOException
 	 */
-	public void write(final Model m) throws OpenRDFException, IOException {
+	public void write(final Model m)  {
 		// connect();
 		// TODO policies handling and validation
-		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		m.write(out);
-		InputStream in = new ByteArrayInputStream(out.toByteArray());
-		getCon().add(in, Properties.getString("url"), RDFFormat.RDFXML);
-		// disconnect();
+		//StringWriter out = new StringWriter();
+		//m.write(out, "N-TRIPLE");
+		//String result = "INSERT DATA { " + out.toString()+ " }";
+		if(m.size() == 0)
+			return;
+		String query = impl.getSPARQLProvider().getGraphSPARQL(impl.getRDFProvider().getModelGraph(m), false).toString();
+		//Send the SPARQL update to the server
+		UpdateRequest queryObj = UpdateFactory.create(query);
+		UpdateProcessor qexec = UpdateExecutionFactory.createRemote(queryObj, endpointWrite);
+		qexec.execute();
 	}
 
 	/**
@@ -170,7 +179,7 @@ public abstract class DataProvider {
 	 * @param direct If true, only direct subclasses are returned. Useful when creating a tree of classes.
 	 * @return List of subclasses.
 	 */
-	public Vector<String> getSubclasses(String type, final boolean direct) {
+	public Vector<String> getSubclasses(final String type, final boolean direct) {
 		Vector<String> classList = new Vector<String>();
 		OntClass c = ontologies.getOntClass(type);
 		if (c == null)
@@ -237,12 +246,9 @@ public abstract class DataProvider {
 	 * Returns iterator over all restrictions that are superclasses of given
 	 * class.
 	 *
-	 * @param label
-	 *            Label of ontology to be searched.
-	 * @param oclass
-	 *            Name of the class.
+	 * @param oclass Name of the class.
 	 * @return Iterator over all restrictions that are superclasses of given
-	 *         class.
+	 * class.
 	 */
 	public Iterator<Restriction> getRestrictionsOnClass(final String oclass) {
 		OntClass c = ontologies.getOntClass(oclass);
@@ -260,9 +266,13 @@ public abstract class DataProvider {
 		return restr.iterator();
 	}
 
-	protected String getEntityDescription(final String resource)
-			throws RepositoryException, MalformedQueryException,
-			QueryEvaluationException {
+	/**
+	 * Gets the entity description.
+	 *
+	 * @param resource the resource
+	 * @return the entity description
+	 */
+	protected String getEntityDescription(final String resource) {
 		// For persons, we have to get the name instead of the title.
 		if (impl.getBasicTypes() != null
 				&& "Agent".equals(impl.getShape(getProperty(
@@ -278,25 +288,21 @@ public abstract class DataProvider {
 	}
 
 	/**
-	 * Loads the adjacencies of the given node.
+	 * Loads the adjacencies of the given node and adds them to the graph object.
 	 *
-	 * @param g
-	 *            The graph to be used.
-	 * @param n
-	 *            Node which adjacencies are returned.
-	 * @param to
-	 *            0=to,1=from,2=both
+	 * @param g The graph to be used.
+	 * @param n Node which adjacencies are returned.
+	 * @param to 0=to,1=from,2=both
 	 */
 	public abstract void getAdjacencies(final Graph g, final Node n,final  int to);
 
 	/**
 	 * Loads the custom properties from the RDF repository.
 	 *
-	 * @param n
-	 * @throws OpenRDFException
+	 * @param n the n
+	 * @param res the res
 	 */
-	public void loadCustomProperties(final Node n, final Resource res)
-			throws OpenRDFException {
+	public void loadCustomProperties(final Node n, final Resource res) {
 		for (String prop : customProperties) {
 			String val = null;
 			if (res == null)
@@ -315,35 +321,29 @@ public abstract class DataProvider {
 	 * Gets the properties of the node from RDF repository. Does not load the
 	 * adjacencies though, in order to avoid greedy crawl of the whole graph.
 	 *
-	 * @param g
-	 * @param resource
+	 * @param g the g
+	 * @param resource the resource
 	 * @return The Node with filled properties without the adjacencies.
-	 * @throws OpenRDFException
 	 */
-	public abstract Node getNode(final Graph g, final String resource) throws OpenRDFException;
+	public abstract Node getNode(final Graph g, final String resource) ;
+
 	/**
 	 * Finds the edge in the RDF repository.
 	 *
-	 * @param g
-	 * @param edgeURI
-	 *            URI of the edge in the repository.
+	 * @param g the g
+	 * @param edgeURI URI of the edge in the repository.
 	 * @return New Edge object.
-	 * @throws RepositoryException
-	 * @throws MalformedQueryException
-	 * @throws QueryEvaluationException
 	 */
-	public abstract Edge getEdge(final Graph g,final  String edgeURI) throws OpenRDFException;
+	public abstract Edge getEdge(final Graph g,final  String edgeURI) ;
 
 	/**
 	 * Return Node from given Resource.
-	 * 
-	 * @param g
-	 * @param res
-	 * @return
-	 * @throws OpenRDFException 
+	 *
+	 * @param g the g
+	 * @param res the res
+	 * @return the node
 	 */
-	public Node getNode(final Graph g, final Resource res) throws OpenRDFException {
-		Node node = null;
+	public Node getNode(final Graph g, final Resource res)  {
 		if (res == null)
 			return null;
 		if (!Utility.isURI(res.getURI()))
@@ -353,15 +353,12 @@ public abstract class DataProvider {
 
 	/**
 	 * Gets the Edge with identifier from given resource.
-	 * 
-	 * @param g
-	 *            The graph.
-	 * @param edge
-	 *            Resource representing the edge.
-	 * @return
-	 * @throws OpenRDFException
+	 *
+	 * @param g The graph.
+	 * @param edge Resource representing the edge.
+	 * @return the edge
 	 */
-	public Edge getEdge(final Graph g, final Resource edge) throws OpenRDFException {
+	public Edge getEdge(final Graph g, final Resource edge)  {
 		if (edge == null)
 			return null;
 		if (!Utility.isURI(edge.getURI()))
@@ -369,60 +366,41 @@ public abstract class DataProvider {
 		return getEdge(g, edge.getURI());
 	}
 
+	/**
+	 * Gets the all provenance.
+	 *
+	 * @return the all provenance
+	 */
 	public Graph getAllProvenance() {
 		List<String> individuals = new ArrayList<String>();
 		for (String c : impl.getNodes()) {
-			try {
 				individuals.addAll(getPropertiesTo(c,
 						"http://www.w3.org/1999/02/22-rdf-syntax-ns#type"));
-			} catch (RepositoryException e) {
-				e.printStackTrace();
-			} catch (QueryEvaluationException e) {
-				e.printStackTrace();
-			} catch (MalformedQueryException e) {
-				e.printStackTrace();
-			}
 		}
 		List<String> edges = new ArrayList<String>();
 		for (String c : impl.getProperties()) {
-			try {
 				edges.addAll(getPropertiesTo(c,
 						"http://www.w3.org/1999/02/22-rdf-syntax-ns#type"));
-			} catch (RepositoryException e) {
-				e.printStackTrace();
-			} catch (QueryEvaluationException e) {
-				e.printStackTrace();
-			} catch (MalformedQueryException e) {
-				e.printStackTrace();
-			}
 		}
 		Graph g = new Graph();
 		for (String ind : individuals) {
 			Node n;
-			try {
 				n = getNode(g, ind);
 				g.addNode(n);
-			} catch (OpenRDFException e) {
-				e.printStackTrace();
-			}
 		}
 		for (String ind : edges) {
 			Edge e;
-			try {
 				e = getEdge(g, ind);
 				g.addEdge(e);
-			} catch (OpenRDFException e2) {
-				e2.printStackTrace();
-			}
 		}
 		return g;
 	}
 
 	/**
 	 * Inserts node into the RDF repository.
-	 * 
-	 * @param n
-	 * @return
+	 *
+	 * @param n the n
+	 * @return the int
 	 */
 	public int insertNode(final Node n) {
 		Model m = impl.getRDFProvider().getNodeModel(n);
@@ -438,10 +416,9 @@ public abstract class DataProvider {
 
 	/**
 	 * Inserts node into the RDF repository.
-	 * 
-	 * @param e
-	 *            Edge to be inserted.
-	 * @return
+	 *
+	 * @param e Edge to be inserted.
+	 * @return the int
 	 */
 	public int insertEdge(final Edge e) {
 		Model m = impl.getRDFProvider().getEdgeModel(e);
@@ -457,9 +434,9 @@ public abstract class DataProvider {
 
 	/**
 	 * Inserts graph into the RDF repository.
-	 * 
-	 * @param g
-	 * @return
+	 *
+	 * @param g the g
+	 * @return the int
 	 */
 	public int insertGraph(final Graph g) {
 		Model m = impl.getRDFProvider().getGraphModel(g);
@@ -475,17 +452,12 @@ public abstract class DataProvider {
 
 	/**
 	 * Gets the subject's property from RDF repository.
-	 * 
-	 * @param subject
-	 * @param property
-	 * @return
-	 * @throws RepositoryException
-	 * @throws MalformedQueryException
-	 * @throws QueryEvaluationException
+	 *
+	 * @param subject the subject
+	 * @param property the property
+	 * @return the property
 	 */
-	protected String getProperty(final String subject, final String property)
-			throws RepositoryException, MalformedQueryException,
-			QueryEvaluationException {
+	protected String getProperty(final String subject, final String property) {
 		StringBuffer qry = new StringBuffer(1024);
 		qry.append("SELECT ?y where { <" + subject + "> <" + property
 				+ "> ?y. } ");
@@ -494,45 +466,40 @@ public abstract class DataProvider {
 
 	/**
 	 * Gets the subject's property from RDF repository.
-	 * 
-	 * @param subject
-	 * @param property
-	 * @return
-	 * @throws RepositoryException
-	 * @throws MalformedQueryException
-	 * @throws QueryEvaluationException
+	 *
+	 * @param subject the subject
+	 * @param property the property
+	 * @return the property to
 	 */
-	protected String getPropertyTo(final String subject, final String property)
-			throws RepositoryException, MalformedQueryException,
-			QueryEvaluationException {
+	protected String getPropertyTo(final String subject, final String property){
 		StringBuffer qry = new StringBuffer(1024);
 		qry.append("SELECT ?y where { ?y <" + property
 				+ "> <" + subject + ">. } ");
 		return executeSparqlQuery(qry);
 	}
+
 	/**
 	 * Gets list of subject's properties from RDF repository.
-	 * 
-	 * @param subject
-	 * @param property
-	 * @return
-	 * @throws RepositoryException
-	 * @throws QueryEvaluationException
-	 * @throws MalformedQueryException
+	 *
+	 * @param subject the subject
+	 * @param property the property
+	 * @return the properties
 	 */
-	@SuppressWarnings("unused")
-	protected List<String> getProperties(final String subject, final String property)
-			throws RepositoryException, QueryEvaluationException,
-			MalformedQueryException {
+	protected List<String> getProperties(final String subject, final String property) {
 		StringBuffer qry = new StringBuffer(1024);
 		qry.append("SELECT ?y where { <" + subject + "> <" + property
 				+ "> ?y } ");
 		return executeArraySparqlQuery(qry);
 	}
 
-	protected List<String> getPropertiesTo(final String subject, final String property)
-			throws RepositoryException, QueryEvaluationException,
-			MalformedQueryException {
+	/**
+	 * Gets the properties to.
+	 *
+	 * @param subject the subject
+	 * @param property the property
+	 * @return the properties to
+	 */
+	protected List<String> getPropertiesTo(final String subject, final String property) {
 		StringBuffer qry = new StringBuffer(1024);
 		qry.append("SELECT ?y where { ?y <" + property + "> <" + subject
 				+ ">  } ");
@@ -541,41 +508,34 @@ public abstract class DataProvider {
 
 	/**
 	 * Executes given query on the RDF repository.
-	 * 
-	 * @param qry
-	 * @return
-	 * @throws RepositoryException
-	 * @throws QueryEvaluationException
-	 * @throws MalformedQueryException
+	 *
+	 * @param qry Query in SPARQL.
+	 * @return Result to the query from SPARQL Endpoint or ontologies
 	 */
-	protected List<String> executeArraySparqlQuery(final StringBuffer qry)
-			throws RepositoryException, QueryEvaluationException,
-			MalformedQueryException {
+	protected List<String> executeArraySparqlQuery(final StringBuffer qry) {
+		Query query = QueryFactory.create(qry.toString());
+		QueryExecution qexec = QueryExecutionFactory.sparqlService(endpoint, query);
+
+		ResultSet results = qexec.execSelect();
+		qexec.close();
+
 		List<String> resource = new ArrayList<String>();
-		//Results from the repository.
-		String query = qry.toString();
-		// connect();
-		if(getCon() != null){
-			TupleQuery output = getCon().prepareTupleQuery(QueryLanguage.SPARQL,query);
-			TupleQueryResult result = output.evaluate();
-			while (result.hasNext()) {
-				BindingSet bindingSet = result.next();
-				Value value = bindingSet.getValue("y");
-				resource.add(value.stringValue());
-			}
-			result.close();
+		while (results.hasNext()) {
+			QuerySolution bindingSet = results.next();
+			RDFNode value = bindingSet.get("y");
+			resource.add(value.toString());
 		}
 
-		//Results from the ontologies.
-		Query queryOb = QueryFactory.create(query);
+		// Results from the ontologies.
+		Query queryOb = QueryFactory.create(qry.toString());
 		// Execute the query and obtain results
 		QueryExecution qe = QueryExecutionFactory.create(queryOb, ontologies);
 		ResultSet jenaResults = qe.execSelect();
 		QuerySolution bindingSet = null;
-		while(jenaResults.hasNext()){
-			bindingSet = jenaResults.next() ;
+		while (jenaResults.hasNext()) {
+			bindingSet = jenaResults.next();
 			Object res = bindingSet.get("y");
-			if(res != null)
+			if (res != null)
 				resource.add(res.toString());
 		}
 		// disconnect();
@@ -584,39 +544,33 @@ public abstract class DataProvider {
 
 	/**
 	 * Executes given query on the RDF repository.
-	 * 
-	 * @param qry
-	 * @return
-	 * @throws RepositoryException
-	 * @throws MalformedQueryException
-	 * @throws QueryEvaluationException
+	 *
+	 * @param qry Query in SPARQL.
+	 * @return Result to the query from SPARQL Endpoint or ontologies
 	 */
-	protected String executeSparqlQuery(final StringBuffer qry)
-			throws RepositoryException, MalformedQueryException,
-			QueryEvaluationException {
+	protected String executeSparqlQuery(final StringBuffer qry) {
 		String resource = null;
-		String query = qry.toString();
-		// connect();
-		if(getCon() != null){
-			TupleQuery output = getCon().prepareTupleQuery(QueryLanguage.SPARQL,
-					query);
-			TupleQueryResult result = output.evaluate();
-			while (result.hasNext()) {
-				BindingSet bindingSet = result.next();
-				Value value = bindingSet.getValue("y");
-				resource = value.stringValue();
-			}
-			result.close();
+		Query query = QueryFactory.create(qry.toString());
+		QueryExecution qexec = QueryExecutionFactory.sparqlService(endpoint, query);
+
+		ResultSet results = qexec.execSelect();
+		qexec.close();
+
+		while (results.hasNext()) {
+			QuerySolution bindingSet = results.next();
+			RDFNode value = bindingSet.get("y");
+			resource = value.toString();
 		}
+
 		if(resource == null){
 
 			//Results from the ontologies.
-			Query queryOb = QueryFactory.create(query);
+			Query queryOb = QueryFactory.create(qry.toString());
 			// Execute the query and obtain results
 			QueryExecution qe = QueryExecutionFactory.create(queryOb, ontologies);
 			ResultSet jenaResults = qe.execSelect();
 			QuerySolution bindingSet = null;
-			
+
 			while( jenaResults.hasNext()){
 				bindingSet = jenaResults.next() ;
 				Object res = bindingSet.get("y");
@@ -628,50 +582,39 @@ public abstract class DataProvider {
 		return resource;
 	}
 
+
 	/**
-	 * Connects to the repository.
+	 * Gets the custom properties.
 	 *
-	 * @throws RepositoryException
+	 * @return the custom properties
 	 */
-	public void connect() throws RepositoryException {
-		if (con != null)
-			return;
-		Repository rep = new HTTPRepository(Properties.getString("url"),
-				Properties.getString("repository"));
-		rep.initialize();
-		setCon(rep.getConnection());
-	}
-
-	/**
-	 * Disconnects from the repository.
-	 * 
-	 * @throws RepositoryException
-	 */
-	public void disconnect() throws RepositoryException {
-
-		getCon().close();
-	}
-
-	public RepositoryConnection getCon() {
-		return this.con;
-	}
-
-	public void setCon(final RepositoryConnection con) {
-		this.con = con;
-	}
-
 	public List<String> getCustomProperties() {
 		return customProperties;
 	}
 
+	/**
+	 * Sets the custom properties.
+	 *
+	 * @param customProperties the new custom properties
+	 */
 	public void setCustomProperties(final List<String> customProperties) {
 		this.customProperties = customProperties;
 	}
 
+	/**
+	 * Gets the ontologies.
+	 *
+	 * @return the ontologies
+	 */
 	public OntModel getOntologies() {
 		return this.ontologies;
 	}
 
+	/**
+	 * Sets the ontologies.
+	 *
+	 * @param ontologies the new ontologies
+	 */
 	public void setOntologies(final OntModel ontologies) {
 		this.ontologies = ontologies;
 	}

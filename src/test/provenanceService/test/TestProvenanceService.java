@@ -5,16 +5,12 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
-
-import org.openrdf.OpenRDFException;
-
 import provenanceService.Edge;
 import provenanceService.Graph;
 import provenanceService.Node;
 import provenanceService.Properties;
 import provenanceService.ProvenanceService;
 import provenanceService.ProvenanceServiceImpl;
-import provenanceService.provenanceModel.OPMJSONProvider;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.Resource;
@@ -43,7 +39,6 @@ public class TestProvenanceService extends TestCase {
 	
 	private void checkGraph(Graph g){
 		for (int i = 0; i < g.size(); i++) {
-			try {
 				Node n = g.get(i);
 				Node n2 = AllTests.impl.getProvProvider().getDataProvider().getNode(null, n.getId());
 				assertTrue(n.equals(n2));
@@ -51,10 +46,6 @@ public class TestProvenanceService extends TestCase {
 					Edge e2 = AllTests.impl.getProvProvider().getDataProvider().getEdge(null, e.getId());
 					assertTrue(e.equals(e2));					
 				}
-			} catch (org.openrdf.OpenRDFException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
 		}
 	}
 	private void checkRDFGraph(Graph g, Model m){

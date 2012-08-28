@@ -3,12 +3,6 @@ package provenanceService.provenanceModel;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.openrdf.OpenRDFException;
-import org.openrdf.query.MalformedQueryException;
-import org.openrdf.query.QueryEvaluationException;
-import org.openrdf.repository.RepositoryException;
-
-import provenanceService.DataProvider;
 import provenanceService.Edge;
 import provenanceService.Graph;
 import provenanceService.Node;
@@ -26,12 +20,9 @@ public class OPMDataProvider extends DataProvider {
 	/**
 	 * Loads the adjacencies of the given node.
 	 *
-	 * @param g
-	 *            The graph to be used.
-	 * @param n
-	 *            Node which adjacencies are returned.
-	 * @param to
-	 *            0=to,1=from,2=both
+	 * @param g   The graph to be used.
+	 * @param n   Node which adjacencies are returned.
+	 * @param to  0=to,1=from,2=both
 	 */
 	public void getAdjacencies(final Graph g, final Node n,final  int to) {
 		try {
@@ -64,12 +55,11 @@ public class OPMDataProvider extends DataProvider {
 	 * Gets the properties of the node from RDF repository. Does not load the
 	 * adjacencies though, in order to avoid greedy crawl of the whole graph.
 	 *
-	 * @param g
-	 * @param resource
+	 * @param g Graph that potentially contains the resource
+	 * @param resource URI of the node
 	 * @return The Node with filled properties without the adjacencies.
-	 * @throws OpenRDFException
 	 */
-	public Node getNode(final Graph g, final String resource) throws OpenRDFException {
+	public Node getNode(final Graph g, final String resource) {
 		if (!Utility.isURI(resource))
 			return null;
 		Node node = null;
@@ -93,15 +83,11 @@ public class OPMDataProvider extends DataProvider {
 	/**
 	 * Finds the edge in the RDF repository.
 	 *
-	 * @param g
-	 * @param edgeURI
-	 *            URI of the edge in the repository.
+	 * @param g Graph that potentially contains the resource
+	 * @param edgeURI URI of the edge in the repository.
 	 * @return New Edge object.
-	 * @throws RepositoryException
-	 * @throws MalformedQueryException
-	 * @throws QueryEvaluationException
 	 */
-	public Edge getEdge(final Graph g,final  String edgeURI) throws OpenRDFException {
+	public Edge getEdge(final Graph g,final  String edgeURI) {
 		if (edgeURI == null || edgeURI.equals(""))
 			return null;
 		if (!Utility.isURI(edgeURI))

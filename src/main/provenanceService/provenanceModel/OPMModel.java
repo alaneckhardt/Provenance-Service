@@ -1,8 +1,5 @@
 package provenanceService.provenanceModel;
 
-import java.util.ArrayList;
-import java.util.UUID;
-
 import provenanceService.ProvenanceServiceException;
 import provenanceService.ProvenanceServiceImpl;
 import provenanceService.Utility;
@@ -23,7 +20,7 @@ public class OPMModel extends ProvenanceModel{
 	/** Adds relationship to the process. Causal relationships are e.g.
 	 * controlledBy, Used, wasGeneratedBy,...
 	 *
-	 * @param sessionId Id of the session.
+	 * @param model RDF model of the session.
 	 *            URI of the process to be the relation added to.
 	 * @param type
 	 *            The type of the causal relationship.
@@ -35,7 +32,7 @@ public class OPMModel extends ProvenanceModel{
 	 *            or other process.
 	 * @return URI of the new relationship.
 	 * @throws ProvenanceServiceException */
-	public String addCausalRelationship(Model model, final String type, final String from, final String to) throws ProvenanceServiceException{
+	public String addCausalRelationship(final Model model, final String type, final String from, final String to) throws ProvenanceServiceException{
 		String relationId = psi.getNewURI();
 		Resource relationship = model.createResource(relationId);
 		Resource c = model.getResource(from);
@@ -51,10 +48,10 @@ public class OPMModel extends ProvenanceModel{
 	 *
 	 * @param type
 	 *            Type of the node
-	 * @param sessionId Id of the session.
+	 * @param model RDF model of the session.
 	 * @return URI of the new resource.
 	 * @throws ProvenanceServiceException */
-	public String addNode(Model model, final String type) throws ProvenanceServiceException{
+	public String addNode(final Model model, final String type) throws ProvenanceServiceException{
 		String instanceId = psi.getNewURI();
 		Resource res = model.createResource(instanceId);
 		model.createResource(type);

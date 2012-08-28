@@ -1,10 +1,7 @@
 package provenanceService.provenanceModel;
 
-import java.util.UUID;
-
 import provenanceService.ProvenanceServiceException;
 import provenanceService.ProvenanceServiceImpl;
-import provenanceService.Utility;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.Resource;

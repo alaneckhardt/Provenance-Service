@@ -2,13 +2,7 @@ package provenanceService;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.StringReader;
 import java.net.URLDecoder;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
@@ -17,21 +11,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import net.sf.json.JSONArray;
-import net.sf.json.JSONSerializer;
-
-import org.openrdf.OpenRDFException;
-import org.openrdf.query.MalformedQueryException;
-import org.openrdf.query.QueryEvaluationException;
-import org.openrdf.repository.RepositoryException;
-
-import com.hp.hpl.jena.iri.IRI;
-import com.hp.hpl.jena.iri.IRIFactory;
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.Property;
-import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.vocabulary.OWL;
-import com.hp.hpl.jena.vocabulary.RDF;
 
 /**
  * Provenance service can stored the given provenance data in the database. The
@@ -221,9 +200,10 @@ public class ProvenanceService extends javax.servlet.http.HttpServlet implements
 				String session = request.getParameter("session");
 				session = URLDecoder.decode(session, "UTF-8");
 				try {
+					impl.clean(session);
 					impl.commit(session);
 					output = "ok";
-				} catch (OpenRDFException e) {
+				} catch (Exception e) {
 					e.printStackTrace();
 					output = "Error " + e.getLocalizedMessage();
 				}
@@ -250,7 +230,7 @@ public class ProvenanceService extends javax.servlet.http.HttpServlet implements
 				try {
 					g = impl.getProvenance(resource, session);
 					output = graphToJSONString(g);
-				} catch (OpenRDFException e) {
+				} catch (Exception e) {
 					e.printStackTrace();
 					output = "Error " + e.getLocalizedMessage();
 				}
@@ -258,15 +238,10 @@ public class ProvenanceService extends javax.servlet.http.HttpServlet implements
 				String resource = request.getParameter("resource");
 				resource = URLDecoder.decode(resource, "UTF-8");
 				Node n = null;
-				try {
 					n = impl.getDataProvider().getNode(null, resource);
 					Graph g = new Graph();
 					g.addNode(n);
 					output = graphToJSONString(g);
-				} catch (OpenRDFException e) {
-					e.printStackTrace();
-					output = "Error " + e.getLocalizedMessage();
-				}
 			}
 
 		} catch (ProvenanceServiceException e) {
