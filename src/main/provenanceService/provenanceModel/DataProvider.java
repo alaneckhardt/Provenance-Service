@@ -107,6 +107,25 @@ public abstract class DataProvider {
 	}
 
 	/**
+	 * Executes SPARQL update on the remote endpoint.
+	 * @param query Update to be executed.
+	 */
+	protected void executeUpdate(final String query){
+		//Send the SPARQL update to the server
+		try{
+		UpdateRequest queryObj = UpdateFactory.create(query);
+		UpdateProcessor qexec = UpdateExecutionFactory.createRemoteForm(queryObj, endpointWrite);
+		qexec.execute();
+		}
+		catch(Exception e){
+			//Try the other method
+			UpdateRequest queryObj = UpdateFactory.create(query);
+			UpdateProcessor qexec = UpdateExecutionFactory.createRemote(queryObj, endpointWrite);
+			qexec.execute();
+		}
+	}
+
+	/**
 	 * Deletes the list of uris from the repository.
 	 *
 	 * @param uris List of uris to be deleted.
@@ -122,11 +141,7 @@ public abstract class DataProvider {
 			else
 				query = impl.getSPARQLProvider().getEdgeSPARQL(e).toString();
 			query = "DELETE DATA { " + query + " }";
-
-			//Send the SPARQL update to the server
-			UpdateRequest queryObj = UpdateFactory.create(query);
-			UpdateProcessor qexec = UpdateExecutionFactory.createRemote(queryObj, endpointWrite);
-			qexec.execute();
+			executeUpdate(query);
 		}
 		// disconnect();
 	}
@@ -148,10 +163,7 @@ public abstract class DataProvider {
         UpdateAction.execute(ur,gs);*/
 
 		String query = impl.getSPARQLProvider().getGraphSPARQL(impl.getRDFProvider().getModelGraph(delete), false).toString();
-		//Send the SPARQL update to the server
-		UpdateRequest queryObj = UpdateFactory.create(query);
-		UpdateProcessor qexec = UpdateExecutionFactory.createRemote(queryObj, endpointWrite);
-		qexec.execute();
+		executeUpdate(query);
 	}
 
 	/**
@@ -166,11 +178,8 @@ public abstract class DataProvider {
 		//String result = "INSERT DATA { " + out.toString()+ " }";
 		if(m.size() == 0)
 			return;
-		String query = impl.getSPARQLProvider().getGraphSPARQL(impl.getRDFProvider().getModelGraph(m), false).toString();
-		//Send the SPARQL update to the server
-		UpdateRequest queryObj = UpdateFactory.create(query);
-		UpdateProcessor qexec = UpdateExecutionFactory.createRemote(queryObj, endpointWrite);
-		qexec.execute();
+		String query = impl.getSPARQLProvider().getGraphSPARQL(impl.getRDFProvider().getModelGraph(m), true).toString();
+		executeUpdate(query);
 	}
 
 	/**
