@@ -105,12 +105,12 @@ public class ProvenanceService extends javax.servlet.http.HttpServlet implements
 		try {
 			if ("addExistingResource".equals(action)) {
 				String type = request.getParameter("type");
-				type = URLDecoder.decode(type, "UTF-8");
 				String session = request.getParameter("session");
-				type = URLDecoder.decode(type, "UTF-8");
 				String resource = request.getParameter("resource");
-				type = URLDecoder.decode(type, "UTF-8");
 				String title = request.getParameter("title");
+				type = URLDecoder.decode(type, "UTF-8");
+				session = URLDecoder.decode(session, "UTF-8");
+				resource = URLDecoder.decode(resource, "UTF-8");
 				title = URLDecoder.decode(title, "UTF-8");
 				impl.addExistingResource(session, resource, type, title);
 				output = "ok";
@@ -123,23 +123,25 @@ public class ProvenanceService extends javax.servlet.http.HttpServlet implements
 				output = "ok";
 			} else if ("addProcess".equals(action)) {
 				String type = request.getParameter("type");
-				type = URLDecoder.decode(type, "UTF-8");
 				String session = request.getParameter("session");
 				session = URLDecoder.decode(session, "UTF-8");
 				if (type == null)
 					output = impl.addProcess(session);
-				else
+				else{
+					type = URLDecoder.decode(type, "UTF-8");
 					output = impl.addNode(session, type);
+				}
 
 			} else if ("addAgent".equals(action)) {
 				String type = request.getParameter("type");
-				type = URLDecoder.decode(type, "UTF-8");
 				String session = request.getParameter("session");
 				session = URLDecoder.decode(session, "UTF-8");
 				if (type == null)
 					output += impl.addAgent(session);
-				else
+				else{
+					type = URLDecoder.decode(type, "UTF-8");
 					output += impl.addNode(session, type);
+				}
 
 			} else if ("addArtifact".equals(action)) {
 				String type = request.getParameter("type");
@@ -147,13 +149,16 @@ public class ProvenanceService extends javax.servlet.http.HttpServlet implements
 				session = URLDecoder.decode(session, "UTF-8");
 				if (type == null)
 					output = impl.addArtifact(session);
-				else
+				else{
+					type = URLDecoder.decode(type, "UTF-8");
 					output = impl.addNode(session, type);
+				}
 
 			} else if ("addNode".equals(action)) {
 				String type = request.getParameter("type");
 				String session = request.getParameter("session");
 				session = URLDecoder.decode(session, "UTF-8");
+				type = URLDecoder.decode(type, "UTF-8");
 				output = impl.addNode(session, type);
 			} else if ("addCausalRelationship".equals(action)) {
 				String from = request.getParameter("from");
@@ -167,24 +172,36 @@ public class ProvenanceService extends javax.servlet.http.HttpServlet implements
 				output = impl.addCausalRelationship(session, relation, from, to);
 			} else if ("addTitle".equals(action)) {
 				String title = request.getParameter("title");
-				String object = request.getParameter("object");
+				String resource = request.getParameter("resource");
 				String session = request.getParameter("session");
-				object = URLDecoder.decode(object, "UTF-8");
+				resource = URLDecoder.decode(resource, "UTF-8");
 				session = URLDecoder.decode(session, "UTF-8");
 				title = URLDecoder.decode(title, "UTF-8");
-				impl.addTitle(session, object, title);
-				output = "ok";
+				impl.addTitle(session, resource, title);
+				output = "ok";			
+			} else if ("addCustomProperty".equals(action)) {
+					String property = request.getParameter("property");
+					String value = request.getParameter("value");
+					String resource = request.getParameter("resource");
+					String session = request.getParameter("session");
+					resource = URLDecoder.decode(resource, "UTF-8");
+					session = URLDecoder.decode(session, "UTF-8");
+					value = URLDecoder.decode(value, "UTF-8");
+					property = URLDecoder.decode(property, "UTF-8");
+					impl.addCustomProperty(session, resource, property, value);
+					output = "ok";
+
 			} else if ("removeCausalRelationShip".equals(action)) {
 				String session = request.getParameter("session");
-				session = URLDecoder.decode(session, "UTF-8");
 				String relation = request.getParameter("relation");
+				session = URLDecoder.decode(session, "UTF-8");
 				relation = URLDecoder.decode(relation, "UTF-8");
 				impl.removeCausalRelationShip(session, relation);
 				output = "ok";
 			} else if ("removeNode".equals(action)) {
 				String session = request.getParameter("session");
-				session = URLDecoder.decode(session, "UTF-8");
 				String node = request.getParameter("node");
+				session = URLDecoder.decode(session, "UTF-8");
 				node = URLDecoder.decode(node, "UTF-8");
 				impl.removeNode(session, node);
 				output = "ok";
