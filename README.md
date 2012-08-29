@@ -39,7 +39,7 @@ An example of usage of Provenance Service in a java code:
 
 
 
-Licensing
+#Licensing
 
 Provenance service is distributed under BSD-2-clause licensing:
 
