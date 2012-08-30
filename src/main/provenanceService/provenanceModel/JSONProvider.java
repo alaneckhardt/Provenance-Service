@@ -13,8 +13,7 @@ import provenanceService.Node;
  * Class for transformation between the Graph and JSON representation of the
  * provenance.
  *
- * @author AE
- *
+ * @author Alan Eckhardt a.e@centrum.cz
  */
 public interface JSONProvider {
 	/**

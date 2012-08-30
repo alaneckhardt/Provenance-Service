@@ -5,7 +5,7 @@ import javax.servlet.http.HttpSession;
 
 /**
  * Class helps handling session and request parameters. Request and session parameter has to be given to this class.
- * @author AE
+ * @author Alan Eckhardt a.e@centrum.cz
  * @version 1.0
  */
 public class ParameterHelper {

@@ -8,7 +8,10 @@ import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.vocabulary.RDF;
 
-
+/**
+ * 
+ * @author Alan Eckhardt a.e@centrum.cz
+ */
 public class PROVOModel extends ProvenanceModel{
 	public PROVOModel(ProvenanceServiceImpl psi) {
 		super(psi);

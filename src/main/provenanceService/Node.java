@@ -10,9 +10,7 @@ import net.sf.json.JSONObject;
 /**
  * Class representing a node in the provenance graph. It could be a process,
  * agent or a resource, though no check of the type is performed.
- * 
- * @author AE
- * 
+ * @author Alan Eckhardt a.e@centrum.cz
  */
 public class Node {
 

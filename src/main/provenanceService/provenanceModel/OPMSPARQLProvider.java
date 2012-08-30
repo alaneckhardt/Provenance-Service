@@ -9,7 +9,8 @@ import com.hp.hpl.jena.vocabulary.RDF;
 /** Class for transformation between the Graph and JSON representation of the
  * provenance.
  *
- * @author AE */
+ * @author Alan Eckhardt a.e@centrum.cz
+ */
 public final class OPMSPARQLProvider extends SPARQLProvider{
 
 	/** Private constructor. */

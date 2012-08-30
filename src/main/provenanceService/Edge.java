@@ -5,11 +5,10 @@ import java.util.Map;
 
 import net.sf.json.JSONObject;
 
-// TODO: Auto-generated Javadoc
 /**
  * Class representing an edge between two nodes.
  *
- * @author AE
+ * @author Alan Eckhardt a.e@centrum.cz
  *
  */
 public class Edge {
@@ -27,7 +26,7 @@ public class Edge {
 	 *
 	 * @param id the id
 	 */
-	public Edge(String id) {
+	public Edge(final String id) {
 		if (id == null)
 			throw new NullPointerException();
 		this.id = id;
@@ -96,8 +95,8 @@ public class Edge {
 		return to;
 	}
 	/**
-	 * 
-	 * @param to
+	 *
+	 * @param to Setter for to.
 	 */
 	public void setTo(final Node to) {
 		this.to = to;

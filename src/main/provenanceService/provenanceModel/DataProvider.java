@@ -40,8 +40,7 @@ import com.hp.hpl.jena.util.iterator.ExtendedIterator;
  * Class providing functions for manipulation with RDF. Conversions between
  * Graph and RDF and querying the underlying RDF repository as well.
  *
- * @author AE
- *
+ * @author Alan Eckhardt a.e@centrum.cz
  */
 public abstract class DataProvider {
 	/** All the ontologies loaded into one big model. */

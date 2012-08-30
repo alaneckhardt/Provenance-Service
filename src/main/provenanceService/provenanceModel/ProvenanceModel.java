@@ -5,7 +5,10 @@ import provenanceService.ProvenanceServiceImpl;
 
 import com.hp.hpl.jena.rdf.model.Model;
 
-
+/**
+ * 
+ * @author Alan Eckhardt a.e@centrum.cz
+ */
 public abstract class ProvenanceModel{
 
 	protected JSONProvider JSONProvider;

@@ -28,7 +28,8 @@ import com.hp.hpl.jena.vocabulary.RDF;
 /** Class providing functions for manipulation with RDF. Conversions between
  * Graph and RDF and querying the underlying RDF repository as well.
  *
- * @author AE */
+ * @author Alan Eckhardt a.e@centrum.cz
+ */
 public final class PROVORDFProvider extends RDFProvider {
 
 	/** Return Node from given Resource.

@@ -2,7 +2,7 @@ package provenanceService;
 
 /**
  *
- * @author AE
+ * @author Alan Eckhardt a.e@centrum.cz
  * @version 1.0
  */
 public class ProvenanceServiceException extends Exception {

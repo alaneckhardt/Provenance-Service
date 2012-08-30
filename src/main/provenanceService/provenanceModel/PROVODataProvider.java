@@ -14,8 +14,7 @@ import provenanceService.Utility;
  * Class providing functions for manipulation with RDF. Conversions between
  * Graph and RDF and querying the underlying RDF repository as well.
  *
- * @author AE
- *
+ * @author Alan Eckhardt a.e@centrum.cz
  */
 public class PROVODataProvider extends DataProvider {
 	/**

@@ -4,8 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 /**
  * Class representing a provenance graph.
- * @author AE
- *
+ * @author Alan Eckhardt a.e@centrum.cz
  */
 public class Graph {
 	/**List of the Nodes in the graph.*/

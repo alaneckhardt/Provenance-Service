@@ -81,8 +81,8 @@ import com.hp.hpl.jena.vocabulary.RDF;
  * &nbsp;&nbsp;],<br>
  * &nbsp;}&nbsp;&nbsp;&nbsp;<br>
  *
- * @author AE
- * @version 1.0 */
+ * @author Alan Eckhardt a.e@centrum.cz 
+ * * @version 1.0 */
 public class ProvenanceServiceImpl {
 	/** Index of last session. */
 	private int lastSession = 0;

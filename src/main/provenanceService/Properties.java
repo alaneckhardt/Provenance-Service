@@ -5,9 +5,9 @@ import org.apache.commons.configuration.PropertiesConfiguration;
 
 /**
  * Class providing the access to the configuration files.
- * 
- * @author AE
- * 
+ *
+ * @author Alan Eckhardt a.e@centrum.cz
+ *
  */
 public class Properties {
 

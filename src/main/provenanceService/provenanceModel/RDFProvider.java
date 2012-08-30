@@ -19,7 +19,8 @@ import com.hp.hpl.jena.rdf.model.Statement;
 /** Class providing functions for manipulation with RDF. Conversions between
  * Graph and RDF and querying the underlying RDF repository as well.
  *
- * @author AE */
+ * @author Alan Eckhardt a.e@centrum.cz
+ */
 public abstract class RDFProvider {
 	/**Custom ontologies.*/
 	protected OntModel ontologies;

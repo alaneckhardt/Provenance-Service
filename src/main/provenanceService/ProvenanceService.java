@@ -15,7 +15,7 @@ import net.sf.json.JSONArray;
 /**
  * Provenance service can stored the given provenance data in the database. The
  * primary interface is JSON object of this structure:<br>
- * 
+ *
  * //Node<br>
  * {<br>
  * &nbsp;&nbsp;//Edges<br>
@@ -66,7 +66,7 @@ import net.sf.json.JSONArray;
  * &nbsp;&nbsp;],<br>
  * &nbsp;}&nbsp;&nbsp;&nbsp;<br>
  *
- * @author AE
+ * @author Alan Eckhardt a.e@centrum.cz
  * @version 1.0
  */
 public class ProvenanceService extends javax.servlet.http.HttpServlet implements ServletContextListener, javax.servlet.Servlet {
